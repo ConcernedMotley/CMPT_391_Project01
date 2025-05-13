@@ -29,6 +29,14 @@ GO
 DROP TABLE IF EXISTS StudentCredentials;
 
 -- Drop parent tables
+DROP TABLE IF EXISTS Student;
+
+--TBD if parent or child
+DROP TABLE IF EXISTS Course;
+DROP TABLE IF EXISTS Section;
+DROP TABLE IF EXISTS Takes;
+DROP TABLE IF EXISTS SectionTimeSlot;
+DROP TABLE IF EXISTS Classroom;
 
 
 --Student (student_id, first_name, last_name, department) - Ethan
