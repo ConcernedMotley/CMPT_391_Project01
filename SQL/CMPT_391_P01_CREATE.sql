@@ -41,16 +41,31 @@ DROP TABLE IF EXISTS Classroom;
 
 --Student (student_id, first_name, last_name, department) - Ethan
 
+CREATE TABLE Student (
+    student_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department VARCHAR(100)
+);
+
 --Course (course_id, courseName, credits, prereq) - Ethan
+
+CREATE TABLE Course (
+    CourseID INT PRIMARY KEY,
+    courseName VARCHAR(100),
+    credits INT,
+    prereq INT,
+    --FOREIGN KEY (prereq) REFERENCES Course(course_id)
+);
+
 
 --Section (section_id, year, semester, course_id, courseName) - Sankalp
 CREATE TABLE Section(
-	SectionID int NOT NULL,
+	SectionID int NOT NULL PRIMARY KEY,
 	CourseID int NOT NULL,
 	CrseYear int NOT NULL,
 	Semester varchar(10) NOT NULL,
 	CrseName varchar(20) NOT NULL,
-	CONSTRAINT PK_Section PRIMARY KEY (SectionID, CourseID, CrseYear, Semester),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
 );
 
