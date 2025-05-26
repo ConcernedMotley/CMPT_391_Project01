@@ -56,6 +56,20 @@ CREATE TABLE StudentCredentials (
 );
 
 --sect_timeSlot (timeslot_id,  section_id, st art_time, end_time, day(s)) - Nat
-
+CREATE TABLE Sect_TimeSlot (
+    TimeSlotID INT PRIMARY KEY,
+    SectionID INT NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    DayOfWeek VARCHAR(10) NOT NULL,  -- e.g., 'Monday', 'Tue', etc.
+    FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
+);
 --Classroom (classroom_id, section_id, building, roomNumber, capacity) - Nat
-
+CREATE TABLE Classroom (
+    ClassroomID INT PRIMARY KEY,
+    SectionID INT NOT NULL UNIQUE,  -- Unique if one classroom per section
+    Building VARCHAR(50) NOT NULL,
+    RoomNumber VARCHAR(10) NOT NULL,
+    Capacity INT NOT NULL,
+    FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
+);
