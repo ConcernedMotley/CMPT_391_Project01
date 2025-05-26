@@ -44,8 +44,15 @@ DROP TABLE IF EXISTS Classroom;
 --Course (course_id, courseName, credits, prereq) - Ethan
 
 --Section (section_id, year, semester, course_id, courseName) - Sankalp
-
---Takes (course_id, section_id, grade, student_id) - Sankalp
+CREATE TABLE Section(
+	SectionID int NOT NULL,
+	CourseID int NOT NULL,
+	CrseYear int NOT NULL,
+	Semester varchar(10) NOT NULL,
+	CrseName varchar(20) NOT NULL,
+	CONSTRAINT PK_Section PRIMARY KEY (SectionID, CourseID, CrseYear, Semester),
+	FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
 
 -- StudentCredentials (student_id, username, studentPassword) - Sankalp
 CREATE TABLE StudentCredentials (
@@ -54,6 +61,19 @@ CREATE TABLE StudentCredentials (
 	StudentPassword varchar(20) NOT NULL UNIQUE,
 	--FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
+
+--Takes (course_id, section_id, grade, student_id) - Sankalp
+CREATE TABLE Takes (
+	CourseID int NOT NULL,
+	SectionID int NOT NULL,
+	Grade float,
+	StudentID bigint NOT NULL,
+	CONSTRAINT PK_Takes PRIMARY KEY (CourseID, SectionID, Grade, StudentID),
+	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
+	FOREIGN KEY (StudentID) REFERENCES StudentCredentials(StudentID),
+	FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
+);
+
 
 --sect_timeSlot (timeslot_id,  section_id, st art_time, end_time, day(s)) - Nat
 CREATE TABLE Sect_TimeSlot (
