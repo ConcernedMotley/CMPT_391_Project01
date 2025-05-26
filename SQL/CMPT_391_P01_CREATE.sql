@@ -51,22 +51,21 @@ CREATE TABLE Student (
 --Course (course_id, courseName, credits, prereq) - Ethan
 
 CREATE TABLE Course (
-    course_id INT PRIMARY KEY,
+    CourseID INT PRIMARY KEY,
     courseName VARCHAR(100),
     credits INT,
     prereq INT,
-    FOREIGN KEY (prereq) REFERENCES Course(course_id)
+    --FOREIGN KEY (prereq) REFERENCES Course(course_id)
 );
 
 
 --Section (section_id, year, semester, course_id, courseName) - Sankalp
 CREATE TABLE Section(
-	SectionID int NOT NULL,
+	SectionID int NOT NULL PRIMARY KEY,
 	CourseID int NOT NULL,
 	CrseYear int NOT NULL,
 	Semester varchar(10) NOT NULL,
 	CrseName varchar(20) NOT NULL,
-	CONSTRAINT PK_Section PRIMARY KEY (SectionID, CourseID, CrseYear, Semester),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
 );
 
