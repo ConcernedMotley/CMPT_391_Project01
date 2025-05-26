@@ -42,7 +42,7 @@ DROP TABLE IF EXISTS Classroom;
 --Student (student_id, first_name, last_name, department) - Ethan
 
 CREATE TABLE Student (
-    student_id INT PRIMARY KEY,
+    StudentID bigint PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     department VARCHAR(100)
@@ -71,10 +71,10 @@ CREATE TABLE Section(
 
 -- StudentCredentials (student_id, username, studentPassword) - Sankalp
 CREATE TABLE StudentCredentials (
-	StudentID bigint NOT NULL PRIMARY KEY,
+	StudentID bigint NOT NULL,
 	Username varchar(20) NOT NULL UNIQUE,
 	StudentPassword varchar(20) NOT NULL UNIQUE,
-	--FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+	FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
 
 --Takes (course_id, section_id, grade, student_id) - Sankalp
@@ -85,7 +85,7 @@ CREATE TABLE Takes (
 	StudentID bigint NOT NULL,
 	CONSTRAINT PK_Takes PRIMARY KEY (CourseID, SectionID, Grade, StudentID),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
-	FOREIGN KEY (StudentID) REFERENCES StudentCredentials(StudentID),
+	FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
 	FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
 );
 
@@ -99,6 +99,7 @@ CREATE TABLE Sect_TimeSlot (
     DayOfWeek VARCHAR(10) NOT NULL,  -- e.g., 'Monday', 'Tue', etc.
     FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
 );
+
 --Classroom (classroom_id, section_id, building, roomNumber, capacity) - Nat
 CREATE TABLE Classroom (
     ClassroomID INT PRIMARY KEY,
