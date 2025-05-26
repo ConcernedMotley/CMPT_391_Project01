@@ -41,7 +41,23 @@ DROP TABLE IF EXISTS Classroom;
 
 --Student (student_id, first_name, last_name, department) - Ethan
 
+CREATE TABLE Student (
+    student_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department VARCHAR(100)
+);
+
 --Course (course_id, courseName, credits, prereq) - Ethan
+
+CREATE TABLE Course (
+    course_id INT PRIMARY KEY,
+    courseName VARCHAR(100),
+    credits INT,
+    prereq INT,
+    FOREIGN KEY (prereq) REFERENCES Course(course_id)
+);
+
 
 --Section (section_id, year, semester, course_id, courseName) - Sankalp
 
