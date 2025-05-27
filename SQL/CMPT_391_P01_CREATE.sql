@@ -43,13 +43,14 @@ CREATE TABLE Student (
     department VARCHAR(100)
 );
 
---Course (course_id, courseName, credits, prereq) - Ethan
+--Course (course_id,courseLabel, courseName, credits, prereq) - Ethan
 
 CREATE TABLE Course (
     CourseID INT PRIMARY KEY,
+    courseLabel VARCHAR(4),      -- e.g., 'CMPT', 'ENGL'
     courseName VARCHAR(100),
     credits INT,
-    prereq INT,
+    prereq INT
 );
 
 --Classroom (classroom_id, building, roomNumber, capacity) - Nat
