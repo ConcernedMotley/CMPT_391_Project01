@@ -38,9 +38,7 @@ DROP TABLE IF EXISTS Takes;
 DROP TABLE IF EXISTS SectionTimeSlot;
 DROP TABLE IF EXISTS Classroom;
 
-
 --Student (student_id, first_name, last_name, department) - Ethan
-
 CREATE TABLE Student (
     StudentID bigint PRIMARY KEY,
     first_name VARCHAR(50),
@@ -55,7 +53,6 @@ CREATE TABLE Course (
     courseName VARCHAR(100),
     credits INT,
     prereq INT,
-    --FOREIGN KEY (prereq) REFERENCES Course(course_id)
 );
 
 
@@ -65,7 +62,7 @@ CREATE TABLE Section(
 	CourseID int NOT NULL,
 	CrseYear int NOT NULL,
 	Semester varchar(10) NOT NULL,
-	CrseName varchar(20) NOT NULL,
+	CrseName varchar(40) NOT NULL,
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
 );
 
