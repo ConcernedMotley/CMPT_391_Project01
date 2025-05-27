@@ -11,7 +11,8 @@ USE CMPT_391_P01;
 --select * from Takes;
 --select * from Cart;
 
-USE CMPT_391_P01;
+
+-- SP for Search
 GO
 
 -- Drop if it already exists
