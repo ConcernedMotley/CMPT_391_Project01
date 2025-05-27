@@ -25,18 +25,15 @@ GO
 USE CMPT_391_P01;
 GO
 
--- Drop child tables first
 DROP TABLE IF EXISTS StudentCredentials;
-
--- Drop parent tables
-DROP TABLE IF EXISTS Student;
-
---TBD if parent or child
-DROP TABLE IF EXISTS Course;
-DROP TABLE IF EXISTS Section;
+DROP TABLE IF EXISTS Cart;
 DROP TABLE IF EXISTS Takes;
-DROP TABLE IF EXISTS SectionTimeSlot;
+DROP TABLE IF EXISTS Sect_TimeSlot;
 DROP TABLE IF EXISTS Classroom;
+DROP TABLE IF EXISTS Student;
+DROP TABLE IF EXISTS Section;
+DROP TABLE IF EXISTS Course;
+
 
 --Student (student_id, first_name, last_name, department) - Ethan
 CREATE TABLE Student (
@@ -55,15 +52,25 @@ CREATE TABLE Course (
     prereq INT,
 );
 
+--Classroom (classroom_id, building, roomNumber, capacity) - Nat
+CREATE TABLE Classroom (
+    ClassroomID INT NOT NULL PRIMARY KEY,
+    Building VARCHAR(50) NOT NULL,
+    RoomNumber VARCHAR(10) NOT NULL,
+    Capacity INT NOT NULL,
+);
 
---Section (section_id, year, semester, course_id, courseName) - Sankalp
+--Section (section_id, year, semester, course_id, courseName, ClassroomID, Capicity) - Sankalp
 CREATE TABLE Section(
 	SectionID int NOT NULL PRIMARY KEY,
+	ClassroomID INT NOT NULL,
 	CourseID int NOT NULL,
 	CrseYear int NOT NULL,
 	Semester varchar(10) NOT NULL,
 	CrseName varchar(40) NOT NULL,
-	FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+	Capicity INT NOT NULL,
+	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
+	FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID)
 );
 
 -- StudentCredentials (student_id, username, studentPassword) - Sankalp
@@ -97,12 +104,15 @@ CREATE TABLE Sect_TimeSlot (
     FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
 );
 
---Classroom (classroom_id, section_id, building, roomNumber, capacity) - Nat
-CREATE TABLE Classroom (
-    ClassroomID INT PRIMARY KEY,
-    SectionID INT NOT NULL UNIQUE,  -- Unique if one classroom per section
-    Building VARCHAR(50) NOT NULL,
-    RoomNumber VARCHAR(10) NOT NULL,
-    Capacity INT NOT NULL,
-    FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
+--Cart (SectionID, StudentID, CourseID, CourseName) - Sankalp
+CREATE TABLE Cart (
+	
+	SectionID INT,
+	StudentID BIGINT,
+	CourseID INT,
+	CourseName VARCHAR(100),
+	CONSTRAINT PK_Cart PRIMARY KEY (SectionID, StudentID, CourseID, CourseName),
+	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
+	FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+	FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
 );

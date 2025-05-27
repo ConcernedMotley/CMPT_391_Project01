@@ -2,13 +2,14 @@ USE CMPT_391_P01;
 
 
 --Delete old records
+DELETE FROM Cart;
 DELETE FROM Sect_TimeSlot;
 DELETE FROM Takes;
 DELETE FROM StudentCredentials;
-DELETE FROM Classroom;
 DELETE FROM Section;
 DELETE FROM Course;
 DELETE FROM Student;
+DELETE FROM Classroom;
 
 -- INSERT INTO Student
 INSERT INTO Student (StudentID, first_name, last_name, department)
@@ -88,6 +89,30 @@ VALUES
 (1000033, 'sanders.n', 'pass1000033'),
 (1000034, 'murphy.o', 'pass1000034');
 
+-- Classroom
+INSERT INTO Classroom (ClassroomID, Building, RoomNumber, Capacity)
+VALUES
+(1, 'Anderson Hall', '101A', 50),
+(2, 'Bennett Center', '202B', 40),
+(3, 'Chen Building', '303C', 35),
+(4, 'Diaz Pavilion', '104D', 50),
+(5, 'Evans Annex', '105E', 45),
+(6, 'Anderson Hall', '106A', 60),
+(7, 'Bennett Center', '107B', 50),
+(8, 'Chen Building', '108C', 30),
+(9, 'Diaz Pavilion', '109D', 25),
+(10, 'Evans Annex', '110E', 40),
+(11, 'Anderson Hall', '111A', 35),
+(12, 'Bennett Center', '112B', 45),
+(13, 'Chen Building', '113C', 40),
+(14, 'Diaz Pavilion', '114D', 35),
+(15, 'Evans Annex', '115E', 50),
+(16, 'Anderson Hall', '116A', 30),
+(17, 'Bennett Center', '117B', 25),
+(18, 'Chen Building', '118C', 50),
+(19, 'Diaz Pavilion', '119D', 35),
+(20, 'Evans Annex', '120E', 40);
+
 --Insert Courses
 INSERT INTO Course (CourseID, courseName, credits, prereq)
 VALUES
@@ -113,28 +138,29 @@ VALUES
 (496, 'Capstone Project', 3, 395);
 
 -- Insert Section
-INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName)
+INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID, Capicity)
 VALUES
-(1, 101, 2024, 'Fall', 'Intro to Programming'),
-(2, 200, 2024, 'Fall', 'Data Structures'),
-(3, 204, 2024, 'Winter', 'Algorithms'),
-(4, 229, 2024, 'Winter', 'Computer Architecture'),
-(5, 360, 2025, 'Fall', 'Operating Systems'),
-(6, 291, 2024, 'Fall', 'Databases'),
-(7, 395, 2025, 'Winter', 'Software Engineering'),
-(8, 315, 2024, 'Spring', 'Web Development'),
-(9, 305, 2025, 'Spring', 'Mobile App Development'),
-(10, 255, 2025, 'Fall', 'Machine Learning'),
-(11, 355, 2025, 'Winter', 'Artificial Intelligence'),
-(12, 361, 2025, 'Fall', 'Networks'),
-(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals'),
-(14, 250, 2024, 'Fall', 'Human-Computer Interaction'),
-(15, 272, 2024, 'Fall', 'Discrete Math'),
-(16, 104, 2024, 'Spring', 'Theory of Computation'),
-(17, 391, 2025, 'Spring', 'Advanced Databases'),
-(18, 299, 2025, 'Winter', 'Cloud Computing'),
-(19, 497, 2025, 'Spring', 'DevOps Practices'),
-(20, 496, 2025, 'Spring', 'Capstone Project');
+(1, 101, 2024, 'Fall', 'Intro to Programming', 1, 50),
+(2, 200, 2024, 'Fall', 'Data Structures', 2, 40),
+(3, 204, 2024, 'Winter', 'Algorithms', 3, 35),
+(4, 229, 2024, 'Winter', 'Computer Architecture', 4, 50),
+(5, 360, 2025, 'Fall', 'Operating Systems', 5, 45),
+(6, 291, 2024, 'Fall', 'Databases', 6, 60),
+(7, 395, 2025, 'Winter', 'Software Engineering', 7, 50),
+(8, 315, 2024, 'Spring', 'Web Development', 8, 30),
+(9, 305, 2025, 'Spring', 'Mobile App Development', 9, 25),
+(10, 255, 2025, 'Fall', 'Machine Learning', 10, 40),
+(11, 355, 2025, 'Winter', 'Artificial Intelligence', 11, 35),
+(12, 361, 2025, 'Fall', 'Networks', 12, 45),
+(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals', 13, 40),
+(14, 250, 2024, 'Fall', 'Human-Computer Interaction', 14, 35),
+(15, 272, 2024, 'Fall', 'Discrete Math', 15, 50),
+(16, 104, 2024, 'Spring', 'Theory of Computation', 16, 30),
+(17, 391, 2025, 'Spring', 'Advanced Databases', 17, 25),
+(18, 299, 2025, 'Winter', 'Cloud Computing', 18, 50),
+(19, 497, 2025, 'Spring', 'DevOps Practices', 19, 35),
+(20, 496, 2025, 'Spring', 'Capstone Project', 20, 40);
+
 
 -- Sect timeslots
 INSERT INTO Sect_TimeSlot (TimeSlotID, SectionID, StartTime, EndTime, DayOfWeek)
@@ -160,26 +186,69 @@ VALUES
 (19, 19, '11:00', '12:20', 'Thursday'),
 (20, 20, '08:30', '09:50', 'Friday');
 
--- Classrooms
-INSERT INTO Classroom (ClassroomID, SectionID, Building, RoomNumber, Capacity)
+
+-- Insert dummy data into Cart with prereqs included where needed
+INSERT INTO Cart (SectionID, StudentID, CourseID, CourseName)
 VALUES
-(1, 1, 'Anderson Hall', '101A', 50),
-(2, 2, 'Bennett Center', '202B', 40),
-(3, 3, 'Chen Building', '303C', 35),
-(4, 4, 'Diaz Pavilion', '104D', 50),
-(5, 5, 'Evans Annex', '105E', 45),
-(6, 6, 'Anderson Hall', '106A', 60),
-(7, 7, 'Bennett Center', '107B', 50),
-(8, 8, 'Chen Building', '108C', 30),
-(9, 9, 'Diaz Pavilion', '109D', 25),
-(10, 10, 'Evans Annex', '110E', 40),
-(11, 11, 'Anderson Hall', '111A', 35),
-(12, 12, 'Bennett Center', '112B', 45),
-(13, 13, 'Chen Building', '113C', 40),
-(14, 14, 'Diaz Pavilion', '114D', 35),
-(15, 15, 'Evans Annex', '115E', 50),
-(16, 16, 'Anderson Hall', '116A', 30),
-(17, 17, 'Bennett Center', '117B', 25),
-(18, 18, 'Chen Building', '118C', 50),
-(19, 19, 'Diaz Pavilion', '119D', 35),
-(20, 20, 'Evans Annex', '120E', 40);
+-- Student 1000000 takes Intro + Data Structures (prereq satisfied)
+(1, 1000000, 101, 'Intro to Programming'),
+(2, 1000000, 200, 'Data Structures'),
+
+-- Student 1000001 takes Intro, Data Structures, Algorithms
+(1, 1000001, 101, 'Intro to Programming'),
+(2, 1000001, 200, 'Data Structures'),
+(3, 1000001, 204, 'Algorithms'),
+
+-- Student 1000002 takes Intro, Data Structures, Operating Systems (prereqs)
+(1, 1000002, 101, 'Intro to Programming'),
+(2, 1000002, 200, 'Data Structures'),
+(5, 1000002, 360, 'Operating Systems'),
+
+-- Student 1000003 takes Web Dev, Software Eng (prereq satisfied)
+(1, 1000003, 101, 'Intro to Programming'),
+(2, 1000003, 200, 'Data Structures'),
+(7, 1000003, 395, 'Software Engineering'),
+(8, 1000003, 315, 'Web Development'),
+
+-- Student 1000004 takes Databases, Advanced Databases
+(1, 1000004, 101, 'Intro to Programming'),
+(6, 1000004, 291, 'Databases'),
+(17, 1000004, 391, 'Advanced Databases'),
+
+-- Student 1000005 takes Data Structures + Capstone (prereqs handled)
+(1, 1000005, 101, 'Intro to Programming'),
+(2, 1000005, 200, 'Data Structures'),
+(7, 1000005, 395, 'Software Engineering'),
+(20, 1000005, 496, 'Capstone Project'),
+
+-- Student 1000006 just takes Discrete Math (no prereq)
+(15, 1000006, 272, 'Discrete Math'),
+
+-- Student 1000007 takes Intro, Data Structures, AI track
+(1, 1000007, 101, 'Intro to Programming'),
+(2, 1000007, 200, 'Data Structures'),
+(3, 1000007, 204, 'Algorithms'),
+(10, 1000007, 255, 'Machine Learning'),
+(11, 1000007, 355, 'Artificial Intelligence'),
+
+-- Student 1000008 takes Cybersecurity Fundamentals (needs Architecture)
+(1, 1000008, 101, 'Intro to Programming'),
+(2, 1000008, 200, 'Data Structures'),
+(4, 1000008, 229, 'Computer Architecture'),
+(13, 1000008, 280, 'Cybersecurity Fundamentals'),
+
+-- Student 1000009 repeats Intro (realistic) and takes Web Dev
+(1, 1000009, 101, 'Intro to Programming'),
+(8, 1000009, 315, 'Web Development'),
+
+-- Student 1000010 takes only Theory of Computation (no prereq)
+(16, 1000010, 104, 'Theory of Computation'),
+
+-- Student 1000011 takes Human-Computer Interaction (has prereq)
+(1, 1000011, 101, 'Intro to Programming'),
+(14, 1000011, 250, 'Human-Computer Interaction'),
+
+-- Student 1000012 takes DevOps (prereq = Software Engineering)
+(2, 1000012, 200, 'Data Structures'),
+(7, 1000012, 395, 'Software Engineering'),
+(19, 1000012, 497, 'DevOps Practices');
