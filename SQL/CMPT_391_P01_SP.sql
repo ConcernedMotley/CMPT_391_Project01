@@ -24,8 +24,8 @@ CREATE PROCEDURE sp_GetCoursesByLabel
     @Label VARCHAR(10)
 AS
 BEGIN
-    SELECT CourseID, CourseLabel, courseName, credits, prereq
+    SELECT CourseID, courseLabel, courseName, credits, prereq
     FROM Course
-    WHERE CourseLabel LIKE @Label + '%'
+    WHERE courseLabel LIKE @Label + '%'
 END;
 GO
