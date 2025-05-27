@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -25,6 +26,7 @@ namespace CMPT_391_Project_01
         private Label searchLabel;
         private TextBox searchTextBox;
         private Button searchButton;
+        private FlowLayoutPanel resultsPanel;
 
         private string selectedSemester;
 
@@ -32,6 +34,7 @@ namespace CMPT_391_Project_01
         {
             this.selectedSemester = semester;
             InitializeComponent();
+            RenderSearchResults("CMPT"); // Initial render
         }
 
         private void InitializeComponent()
@@ -43,7 +46,6 @@ namespace CMPT_391_Project_01
             this.BackColor = Color.White;
             this.StartPosition = FormStartPosition.CenterScreen;
 
-            // Sidebar
             sidebar = new Panel
             {
                 Size = new Size(264, 1024),
@@ -76,7 +78,6 @@ namespace CMPT_391_Project_01
             sidebar.Controls.Add(logo);
             sidebar.Controls.Add(navRegistration);
 
-            // Header
             header = new Panel
             {
                 Size = new Size(1176, 80),
@@ -102,7 +103,7 @@ namespace CMPT_391_Project_01
 
             titleLabel = new Label
             {
-                Text = "Course Registration",
+                Text = "Course Registration Search Results:",
                 Font = new Font("Segoe UI", 18F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(11, 35, 94),
                 Location = new Point(60, 25),
@@ -139,7 +140,6 @@ namespace CMPT_391_Project_01
             header.Controls.Add(userRoleLabel);
             header.Controls.Add(profilePic);
 
-            // Main Content
             mainContent = new Panel
             {
                 Size = new Size(1176, 850),
@@ -148,12 +148,12 @@ namespace CMPT_391_Project_01
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            // Semester Panel
             semesterPanel = new Panel
             {
                 Size = new Size(1112, 56),
                 Location = new Point(32, 30),
-                BackColor = Color.FromArgb(11, 35, 94)
+                BackColor = Color.FromArgb(11, 35, 94),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             semesterLabel = new Label
@@ -178,6 +178,7 @@ namespace CMPT_391_Project_01
             {
                 selectedSemester = selectedSemester.ToLower() == "fall" ? "winter" : "fall";
                 semesterLabel.Text = selectedSemester.ToUpper() + " SEMESTER";
+                RenderSearchResults(searchTextBox.Text);
             };
             changeLink.MouseEnter += (s, e) => changeLink.LinkColor = Color.LightBlue;
             changeLink.MouseLeave += (s, e) => changeLink.LinkColor = Color.White;
@@ -185,20 +186,11 @@ namespace CMPT_391_Project_01
             semesterPanel.Controls.Add(semesterLabel);
             semesterPanel.Controls.Add(changeLink);
 
-            searchLabel = new Label
-            {
-                Text = "Search for classes",
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                ForeColor = Color.Black,
-                Location = new Point(30, 100),
-                AutoSize = true
-            };
-
             searchTextBox = new TextBox
             {
                 Font = new Font("Segoe UI", 10F),
                 Size = new Size(1041, 46),
-                Location = new Point(30, 130),
+                Location = new Point(30, 100),
                 ForeColor = Color.Gray,
                 Text = "Search...",
                 BorderStyle = BorderStyle.FixedSingle
@@ -222,22 +214,90 @@ namespace CMPT_391_Project_01
 
             searchButton = new Button
             {
-                Size = new Size(46, 46),
-                Location = new Point(1074, 130),
+                Size = new Size(26, 26),
+                Location = new Point(1074, 100),
                 BackColor = Color.FromArgb(217, 217, 217),
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+                Font = new Font("Segoe UI", 7F, FontStyle.Bold),
                 Text = "🔍"
+            };
+            searchButton.Click += (s, e) => RenderSearchResults(searchTextBox.Text);
+
+            resultsPanel = new FlowLayoutPanel
+            {
+                Location = new Point(30, 160),
+                Size = new Size(1100, 650),
+                AutoScroll = true,
+                BackColor = Color.White
             };
 
             mainContent.Controls.Add(semesterPanel);
-            mainContent.Controls.Add(searchLabel);
             mainContent.Controls.Add(searchTextBox);
             mainContent.Controls.Add(searchButton);
+            mainContent.Controls.Add(resultsPanel);
 
             this.Controls.Add(sidebar);
             this.Controls.Add(header);
             this.Controls.Add(mainContent);
+        }
+
+        private void RenderSearchResults(string keyword)
+        {
+            resultsPanel.Controls.Clear();
+
+            var sampleCourses = new List<(string Code, string Title, string Semester, int ClassCount)>
+            {
+                ("CMPT 101", "Introduction to Programming", "fall", 2),
+                ("CMPT 102", "Data Structures", "fall", 2),
+                ("CMPT 201", "Advanced Programming", "winter", 2),
+                ("CMPT 391", "Database Management Systems", "winter", 2)
+            };
+
+            foreach (var course in sampleCourses)
+            {
+                if (course.Code.ToLower().Contains(keyword.ToLower()) && course.Semester == selectedSemester.ToLower())
+                {
+                    Panel card = new Panel
+                    {
+                        Size = new Size(1040, 80),
+                        BackColor = Color.White,
+                        BorderStyle = BorderStyle.FixedSingle,
+                        Margin = new Padding(0, 10, 0, 0)
+                    };
+
+                    Label code = new Label
+                    {
+                        Text = course.Code,
+                        Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                        ForeColor = Color.FromArgb(11, 35, 94),
+                        Location = new Point(16, 10),
+                        AutoSize = true
+                    };
+
+                    Label title = new Label
+                    {
+                        Text = course.Title,
+                        Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                        ForeColor = Color.FromArgb(11, 35, 94),
+                        Location = new Point(16, 30),
+                        AutoSize = true
+                    };
+
+                    Label options = new Label
+                    {
+                        Text = course.ClassCount + " Class options",
+                        Font = new Font("Segoe UI", 9F, FontStyle.Regular),
+                        ForeColor = Color.Black,
+                        Location = new Point(16, 55),
+                        AutoSize = true
+                    };
+
+                    card.Controls.Add(code);
+                    card.Controls.Add(title);
+                    card.Controls.Add(options);
+                    resultsPanel.Controls.Add(card);
+                }
+            }
         }
     }
 }
