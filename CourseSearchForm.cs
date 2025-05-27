@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace CMPT_391_Project_01
 {
@@ -23,18 +25,18 @@ namespace CMPT_391_Project_01
         private Panel semesterPanel;
         private Label semesterLabel;
         private LinkLabel changeLink;
-        private Label searchLabel;
         private TextBox searchTextBox;
         private Button searchButton;
         private FlowLayoutPanel resultsPanel;
 
         private string selectedSemester;
+        private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public CourseSearchForm(string semester)
         {
             this.selectedSemester = semester;
             InitializeComponent();
-            RenderSearchResults("CMPT"); // Initial render
+            RenderSearchResults("");
         }
 
         private void InitializeComponent()
@@ -245,57 +247,78 @@ namespace CMPT_391_Project_01
         {
             resultsPanel.Controls.Clear();
 
-            var sampleCourses = new List<(string Code, string Title, string Semester, int ClassCount)>
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                ("CMPT 101", "Introduction to Programming", "fall", 2),
-                ("CMPT 102", "Data Structures", "fall", 2),
-                ("CMPT 201", "Advanced Programming", "winter", 2),
-                ("CMPT 391", "Database Management Systems", "winter", 2)
-            };
+                conn.Open();
 
-            foreach (var course in sampleCourses)
-            {
-                if (course.Code.ToLower().Contains(keyword.ToLower()) && course.Semester == selectedSemester.ToLower())
+                using (SqlCommand cmd = new SqlCommand("GetCourseSearchResults", conn))
                 {
-                    Panel card = new Panel
-                    {
-                        Size = new Size(1040, 80),
-                        BackColor = Color.White,
-                        BorderStyle = BorderStyle.FixedSingle,
-                        Margin = new Padding(0, 10, 0, 0)
-                    };
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Semester", selectedSemester.Equals("fall", StringComparison.OrdinalIgnoreCase) ? "Fall" : "Winter");
+                    cmd.Parameters.AddWithValue("@Keyword", $"%{keyword}%");
 
-                    Label code = new Label
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
                     {
-                        Text = course.Code,
-                        Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                        ForeColor = Color.FromArgb(11, 35, 94),
-                        Location = new Point(16, 10),
-                        AutoSize = true
-                    };
+                        string rawCourseId = reader["CourseID"].ToString();         // Save course ID for later
+                        string courseLabel = reader["courseLabel"].ToString();      // Save course label for later
+                        string courseName = reader["courseName"].ToString();        // Save course name for later
+                        int classCount = Convert.ToInt32(reader["ClassCount"]);
 
-                    Label title = new Label
-                    {
-                        Text = course.Title,
-                        Font = new Font("Segoe UI", 14F, FontStyle.Bold),
-                        ForeColor = Color.FromArgb(11, 35, 94),
-                        Location = new Point(16, 30),
-                        AutoSize = true
-                    };
+                        string displayCourseId = courseLabel + " " + rawCourseId;
 
-                    Label options = new Label
-                    {
-                        Text = course.ClassCount + " Class options",
-                        Font = new Font("Segoe UI", 9F, FontStyle.Regular),
-                        ForeColor = Color.Black,
-                        Location = new Point(16, 55),
-                        AutoSize = true
-                    };
 
-                    card.Controls.Add(code);
-                    card.Controls.Add(title);
-                    card.Controls.Add(options);
-                    resultsPanel.Controls.Add(card);
+                        Panel card = new Panel
+                        {
+                            Size = new Size(1040, 80),
+                            BackColor = Color.White,
+                            BorderStyle = BorderStyle.FixedSingle,
+                            Margin = new Padding(0, 10, 0, 0)
+                        };
+
+                        Label codeLabel = new Label
+                        {
+                            Text = displayCourseId,
+                            Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                            ForeColor = Color.FromArgb(11, 35, 94),
+                            Location = new Point(16, 10),
+                            AutoSize = true
+                        };
+
+                        Label titleLabel = new Label
+                        {
+                            Text = courseName,
+                            Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                            ForeColor = Color.FromArgb(11, 35, 94),
+                            Location = new Point(16, 30),
+                            AutoSize = true
+                        };
+
+                        Label classCountLabel = new Label
+                        {
+                            Text = classCount + " Class options",
+                            Font = new Font("Segoe UI", 9F),
+                            ForeColor = Color.Black,
+                            Location = new Point(16, 55),
+                            AutoSize = true
+                        };
+
+                        card.Controls.Add(codeLabel);
+                        card.Controls.Add(titleLabel);
+                        card.Controls.Add(classCountLabel);
+                        resultsPanel.Controls.Add(card);
+
+                        card.Click += (s, e) =>
+                        {
+                            mainContent.Controls.Clear();
+                            mainContent.Controls.Add(new CourseSectionOptionsControl(
+                                rawCourseId,
+                                courseLabel,
+                                courseName,
+                                selectedSemester
+                            ));
+                        };
+                    }
                 }
             }
         }

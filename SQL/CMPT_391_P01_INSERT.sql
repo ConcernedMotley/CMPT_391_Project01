@@ -166,6 +166,8 @@ VALUES
 INSERT INTO Sect_TimeSlot (TimeSlotID, SectionID, StartTime, EndTime, DayOfWeek)
 VALUES
 (1, 1, '09:00', '10:20', 'Monday'),
+(21, 1, '10:20', '11:50', 'Tuesday'),
+(22, 1, '10:20', '11:50', 'Monday'),
 (2, 2, '10:30', '11:50', 'Tuesday'),
 (3, 3, '13:00', '14:20', 'Wednesday'),
 (4, 4, '14:30', '15:50', 'Thursday'),

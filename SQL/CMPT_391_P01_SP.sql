@@ -24,8 +24,38 @@ CREATE PROCEDURE sp_GetCoursesByLabel
     @Label VARCHAR(10)
 AS
 BEGIN
-    SELECT CourseID, CourseLabel, courseName, credits, prereq
+    SELECT CourseID, courseLabel, courseName, credits, prereq
     FROM Course
-    WHERE CourseLabel LIKE @Label + '%'
+    WHERE courseLabel LIKE @Label + '%'
 END;
 GO
+
+
+-- SP for number of class options
+CREATE OR ALTER PROCEDURE GetCourseSearchResults
+    @Semester VARCHAR(10),
+    @Keyword VARCHAR(100)
+AS
+BEGIN
+    SELECT 
+        C.CourseID,
+        C.courseLabel,
+        C.courseName,
+        (
+            SELECT COUNT(DISTINCT ST.TimeSlotID)
+            FROM Section S2
+            JOIN Sect_TimeSlot ST ON S2.SectionID = ST.SectionID
+            WHERE S2.CourseID = C.CourseID AND S2.Semester = @Semester
+        ) AS ClassCount
+    FROM Course C
+    WHERE EXISTS (
+        SELECT 1 
+        FROM Section S 
+        WHERE S.CourseID = C.CourseID AND S.Semester = @Semester
+    )
+    AND (
+        C.courseLabel + ' ' + CAST(C.CourseID AS VARCHAR) LIKE @Keyword
+        OR C.courseName LIKE @Keyword
+    )
+    ORDER BY C.CourseID;
+END;
