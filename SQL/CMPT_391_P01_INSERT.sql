@@ -114,28 +114,28 @@ VALUES
 (20, 'Evans Annex', '120E', 40);
 
 --Insert Courses
-INSERT INTO Course (CourseID, courseName, credits, prereq)
+INSERT INTO Course (CourseID, courseLabel, courseName, credits, prereq)
 VALUES
-(101, 'Intro to Programming', 3, NULL),
-(200, 'Data Structures', 3, 101),
-(204, 'Algorithms', 3, 200),
-(229, 'Computer Architecture', 3, 200),
-(360, 'Operating Systems', 3, 200),
-(291, 'Databases', 3, 101),
-(395, 'Software Engineering', 3, 200),
-(315, 'Web Development', 3, 200),
-(305, 'Mobile App Development', 3, 395),
-(255, 'Machine Learning', 3, 204),
-(355, 'Artificial Intelligence', 3, 255),
-(361, 'Networks', 3, 360),
-(280, 'Cybersecurity Fundamentals', 3, 229),
-(250, 'Human-Computer Interaction', 3, 101),
-(272, 'Discrete Math', 3, NULL),
-(104, 'Theory of Computation', 3, NULL),
-(391, 'Advanced Databases', 3, 291),
-(299, 'Cloud Computing', 3, 200),
-(497, 'DevOps Practices', 3, 395),
-(496, 'Capstone Project', 3, 395);
+(101, 'CMPT', 'Intro to Programming', 3, NULL),
+(200, 'CMPT', 'Data Structures', 3, 101),
+(204, 'CMPT', 'Algorithms', 3, 200),
+(229, 'CMPT', 'Computer Architecture', 3, 200),
+(360, 'CMPT', 'Operating Systems', 3, 200),
+(291, 'CMPT', 'Databases', 3, 101),
+(395, 'CMPT', 'Software Engineering', 3, 200),
+(315, 'CMPT', 'Web Development', 3, 200),
+(305, 'CMPT', 'Mobile App Development', 3, 395),
+(255, 'CMPT', 'Machine Learning', 3, 204),
+(355, 'CMPT', 'Artificial Intelligence', 3, 255),
+(361, 'CMPT', 'Networks', 3, 360),
+(280, 'CMPT', 'Cybersecurity Fundamentals', 3, 229),
+(250, 'CMPT', 'Human-Computer Interaction', 3, 101),
+(272, 'CMPT', 'Discrete Math', 3, NULL),
+(104, 'CMPT', 'Theory of Computation', 3, NULL),
+(391, 'CMPT', 'Advanced Databases', 3, 291),
+(299, 'CMPT', 'Cloud Computing', 3, 200),
+(497, 'CMPT', 'DevOps Practices', 3, 395),
+(496, 'CMPT', 'Capstone Project', 3, 395);
 
 -- Insert Section
 INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID, Capicity)
