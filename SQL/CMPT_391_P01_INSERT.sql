@@ -114,52 +114,52 @@ VALUES
 (20, 'Evans Annex', '120E', 40);
 
 --Insert Courses
-INSERT INTO Course (CourseID, courseName, credits, prereq)
+INSERT INTO Course (CourseID, courseName, credits, prereq, Faculty)
 VALUES
-(101, 'Intro to Programming', 3, NULL),
-(200, 'Data Structures', 3, 101),
-(204, 'Algorithms', 3, 200),
-(229, 'Computer Architecture', 3, 200),
-(360, 'Operating Systems', 3, 200),
-(291, 'Databases', 3, 101),
-(395, 'Software Engineering', 3, 200),
-(315, 'Web Development', 3, 200),
-(305, 'Mobile App Development', 3, 395),
-(255, 'Machine Learning', 3, 204),
-(355, 'Artificial Intelligence', 3, 255),
-(361, 'Networks', 3, 360),
-(280, 'Cybersecurity Fundamentals', 3, 229),
-(250, 'Human-Computer Interaction', 3, 101),
-(272, 'Discrete Math', 3, NULL),
-(104, 'Theory of Computation', 3, NULL),
-(391, 'Advanced Databases', 3, 291),
-(299, 'Cloud Computing', 3, 200),
-(497, 'DevOps Practices', 3, 395),
-(496, 'Capstone Project', 3, 395);
+(101, 'Intro to Programming', 3, NULL, 'CMPT'),
+(200, 'Data Structures', 3, 101, 'CMPT'),
+(204, 'Algorithms', 3, 200, 'CMPT'),
+(229, 'Computer Architecture', 3, 200, 'CMPT'),
+(360, 'Operating Systems', 3, 200, 'CMPT'),
+(291, 'Databases', 3, 101, 'CMPT'),
+(395, 'Software Engineering', 3, 200, 'CMPT'),
+(315, 'Web Development', 3, 200, 'CMPT'),
+(305, 'Mobile App Development', 3, 395, 'CMPT'),
+(255, 'Machine Learning', 3, 204, 'CMPT'),
+(355, 'Artificial Intelligence', 3, 255, 'CMPT'),
+(361, 'Networks', 3, 360, 'CMPT'),
+(280, 'Cybersecurity Fundamentals', 3, 229, 'CMPT'),
+(250, 'Human-Computer Interaction', 3, 101, 'CMPT'),
+(272, 'Discrete Math', 3, NULL, 'CMPT'),
+(104, 'Theory of Computation', 3, NULL, 'CMPT'),
+(391, 'Advanced Databases', 3, 291, 'CMPT'),
+(299, 'Cloud Computing', 3, 200, 'CMPT'),
+(497, 'DevOps Practices', 3, 395, 'CMPT'),
+(496, 'Capstone Project', 3, 395, 'CMPT');
 
 -- Insert Section
-INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID, Capicity)
+INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID, Capicity, Faculty)
 VALUES
-(1, 101, 2024, 'Fall', 'Intro to Programming', 1, 50),
-(2, 200, 2024, 'Fall', 'Data Structures', 2, 40),
-(3, 204, 2024, 'Winter', 'Algorithms', 3, 35),
-(4, 229, 2024, 'Winter', 'Computer Architecture', 4, 50),
-(5, 360, 2025, 'Fall', 'Operating Systems', 5, 45),
-(6, 291, 2024, 'Fall', 'Databases', 6, 60),
-(7, 395, 2025, 'Winter', 'Software Engineering', 7, 50),
-(8, 315, 2024, 'Spring', 'Web Development', 8, 30),
-(9, 305, 2025, 'Spring', 'Mobile App Development', 9, 25),
-(10, 255, 2025, 'Fall', 'Machine Learning', 10, 40),
-(11, 355, 2025, 'Winter', 'Artificial Intelligence', 11, 35),
-(12, 361, 2025, 'Fall', 'Networks', 12, 45),
-(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals', 13, 40),
-(14, 250, 2024, 'Fall', 'Human-Computer Interaction', 14, 35),
-(15, 272, 2024, 'Fall', 'Discrete Math', 15, 50),
-(16, 104, 2024, 'Spring', 'Theory of Computation', 16, 30),
-(17, 391, 2025, 'Spring', 'Advanced Databases', 17, 25),
-(18, 299, 2025, 'Winter', 'Cloud Computing', 18, 50),
-(19, 497, 2025, 'Spring', 'DevOps Practices', 19, 35),
-(20, 496, 2025, 'Spring', 'Capstone Project', 20, 40);
+(1, 101, 2024, 'Fall', 'Intro to Programming', 1, 50, 'CMPT'),
+(2, 200, 2024, 'Fall', 'Data Structures', 2, 40, 'CMPT'),
+(3, 204, 2024, 'Winter', 'Algorithms', 3, 35, 'CMPT'),
+(4, 229, 2024, 'Winter', 'Computer Architecture', 4, 50, 'CMPT'),
+(5, 360, 2025, 'Fall', 'Operating Systems', 5, 45, 'CMPT'),
+(6, 291, 2024, 'Fall', 'Databases', 6, 60, 'CMPT'),
+(7, 395, 2025, 'Winter', 'Software Engineering', 7, 50, 'CMPT'),
+(8, 315, 2024, 'Spring', 'Web Development', 8, 30, 'CMPT'),
+(9, 305, 2025, 'Spring', 'Mobile App Development', 9, 25, 'CMPT'),
+(10, 255, 2025, 'Fall', 'Machine Learning', 10, 40, 'CMPT'),
+(11, 355, 2025, 'Winter', 'Artificial Intelligence', 11, 35, 'CMPT'),
+(12, 361, 2025, 'Fall', 'Networks', 12, 45, 'CMPT'),
+(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals', 13, 40, 'CMPT'),
+(14, 250, 2024, 'Fall', 'Human-Computer Interaction', 14, 35, 'CMPT'),
+(15, 272, 2024, 'Fall', 'Discrete Math', 15, 50, 'CMPT'),
+(16, 104, 2024, 'Spring', 'Theory of Computation', 16, 30, 'CMPT'),
+(17, 391, 2025, 'Spring', 'Advanced Databases', 17, 25, 'CMPT'),
+(18, 299, 2025, 'Winter', 'Cloud Computing', 18, 50, 'CMPT'),
+(19, 497, 2025, 'Spring', 'DevOps Practices', 19, 35, 'CMPT'),
+(20, 496, 2025, 'Spring', 'Capstone Project', 20, 40, 'CMPT');
 
 
 -- Sect timeslots

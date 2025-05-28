@@ -48,6 +48,7 @@ CREATE TABLE Student (
 CREATE TABLE Course (
     CourseID INT PRIMARY KEY,
     courseName VARCHAR(100),
+	Faculty VARCHAR(20),
     credits INT,
     prereq INT,
 );
@@ -69,6 +70,7 @@ CREATE TABLE Section(
 	Semester varchar(10) NOT NULL,
 	CrseName varchar(40) NOT NULL,
 	Capicity INT NOT NULL,
+	Faculty VARCHAR(20),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
 	FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID)
 );

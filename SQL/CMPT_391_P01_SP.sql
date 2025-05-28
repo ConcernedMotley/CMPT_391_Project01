@@ -12,11 +12,13 @@ USE CMPT_391_P01;
 --select * from Cart;
 
 
--- Delete procedure first so you dont have to alter it
+-- Delete procedure(s) first so you dont have to alter it
 IF OBJECT_ID('Get_Enrollment_History', 'p') IS NOT NULL
 	DROP PROCEDURE Get_Enrollment_History;
 GO
 
+
+-- Procedures
 CREATE PROCEDURE Get_Enrollment_History
 @CrseYear INT,
 @Semester varchar(10)
@@ -26,4 +28,6 @@ BEGIN
 END;
 GO
 
-EXEC Get_Enrollment_History @Semester = 'Fall', @CrseYear = 2024;
+
+-- Exec procedures
+--EXEC Get_Enrollment_History @Semester = 'Fall', @CrseYear = 2024;
