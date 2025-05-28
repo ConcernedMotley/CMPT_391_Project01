@@ -14,7 +14,7 @@ namespace CMPT_391_Project_01
         private readonly string courseLabel;
         private readonly string courseName;
         private readonly string semester;
-        private readonly string studentId = "123456"; // TODO: Replace with actual logged-in student ID
+        private readonly string studentId = Session.StudentID;
 
         private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
 
@@ -115,6 +115,28 @@ namespace CMPT_391_Project_01
             };
             registerButton.Click += RegisterButton_Click;
             this.Controls.Add(registerButton);
+
+            Button backButton = new Button
+            {
+                Text = "<",
+                Size = new Size(120, 40),
+                Location = new Point(900, 790),
+                BackColor = Color.LightGray,
+                ForeColor = Color.Black,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold)
+            };
+
+            backButton.Click += (s, e) =>
+            {
+                Form parentForm = this.FindForm();
+                parentForm.Hide();
+                new CourseSearchForm(semester).Show();
+            };
+
+
+            this.Controls.Add(backButton);
+
         }
 
         private void LoadSections()
@@ -164,8 +186,16 @@ namespace CMPT_391_Project_01
                         };
                         radio.CheckedChanged += (s, e) =>
                         {
-                            if (radio.Checked) selectedRadio = radio;
+                            if (radio.Checked)
+                            {
+                                // Deselect the previously selected radio button
+                                if (selectedRadio != null && selectedRadio != radio)
+                                    selectedRadio.Checked = false;
+
+                                selectedRadio = radio;
+                            }
                         };
+
 
                         Panel row = new Panel
                         {
@@ -219,12 +249,20 @@ namespace CMPT_391_Project_01
                         {
                             cmd.ExecuteNonQuery();
                             MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            //  After registration, go back to CourseSearchForm
+                            Form parentForm = this.FindForm();
+                            parentForm.Hide();
+                            CourseSearchForm searchForm = new CourseSearchForm(semester);
+                            searchForm.Show();
                         }
                         catch (SqlException ex)
                         {
                             MessageBox.Show("Registration failed:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
+
+
                 }
             }
         }

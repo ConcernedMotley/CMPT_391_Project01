@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -10,34 +9,64 @@ namespace CMPT_391_Project_01
 {
     public class CourseSearchForm : Form
     {
-        private Panel sidebar;
-        private PictureBox logo;
-        private Button navRegistration;
+        private Panel? sidebar;
+        private PictureBox? logo;
+        private Button? navRegistration;
 
-        private Panel header;
-        private Label titleLabel;
-        private Label userNameLabel;
-        private Label userRoleLabel;
-        private PictureBox profilePic;
-        private Label backArrow;
+        private Panel? header;
+        private Label? titleLabel;
+        private Label? userNameLabel;
+        private Label? userRoleLabel;
+        private PictureBox? profilePic;
+        private Label? backArrow;
 
         private Panel mainContent;
-        private Panel semesterPanel;
-        private Label semesterLabel;
-        private LinkLabel changeLink;
+        private Panel? semesterPanel;
+        private Label? semesterLabel;
+        private LinkLabel? changeLink;
         private TextBox searchTextBox;
-        private Button searchButton;
+        private Button? searchButton;
         private FlowLayoutPanel resultsPanel;
 
         private string selectedSemester;
         private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
 
+        private readonly string studentId;
+
+
         public CourseSearchForm(string semester)
         {
             this.selectedSemester = semester;
+            this.studentId = Session.StudentID; 
             InitializeComponent();
             RenderSearchResults("");
+
+
         }
+        private string GetStudentName(string studentId)
+        {
+            string name = "Student";
+            try
+            {
+                using var conn = new SqlConnection(connectionString);
+                conn.Open();
+
+                using var cmd = new SqlCommand("GetStudentFullName", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@StudentID", studentId);
+
+                var result = cmd.ExecuteScalar();
+                if (result is string fullName)
+                    name = fullName;
+
+            }
+            catch
+            {
+                name = "Student";
+            }
+            return name;
+        }
+
 
         private void InitializeComponent()
         {
@@ -122,11 +151,12 @@ namespace CMPT_391_Project_01
 
             userNameLabel = new Label
             {
-                Text = "Kelvin Yeboah",
+                Text = $"{GetStudentName(studentId)}",
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 Location = new Point(920, 20),
                 AutoSize = true
             };
+
 
             userRoleLabel = new Label
             {
@@ -253,9 +283,11 @@ namespace CMPT_391_Project_01
 
                 using (SqlCommand cmd = new SqlCommand("GetCourseSearchResults", conn))
                 {
+                    cmd.CommandText = "GetCourseSearchResults";
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Semester", selectedSemester.Equals("fall", StringComparison.OrdinalIgnoreCase) ? "Fall" : "Winter");
-                    cmd.Parameters.AddWithValue("@Keyword", $"%{keyword}%");
+                    cmd.Parameters.AddWithValue("@Semester", selectedSemester);
+                    cmd.Parameters.AddWithValue("@Keyword", "%" + keyword + "%");
+
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())

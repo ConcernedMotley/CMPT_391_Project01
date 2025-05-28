@@ -1,45 +1,36 @@
 ﻿using System;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.Data.SqlClient;
 
 namespace CMPT_391_Project_01
 {
     public class SemesterSelectionForm : Form
     {
-        private Panel leftPanel;
-        private Panel rightPanel;
-        private PictureBox logo;
-        private Label secureCourseLabel;
-        private Label welcomeLabel;
-        private Label instructionLabel;
-        private Button fallButton;
-        private Button winterButton;
-        private PictureBox artImage;
-        private Label fallArrow;
-        private Label winterArrow;
+        private Panel leftPanel = null!;
+        private Panel rightPanel = null!;
+        private PictureBox logo = null!;
+        private Label secureCourseLabel = null!;
+        private Label welcomeLabel = null!;
+        private Label instructionLabel = null!;
+        private Button fallButton = null!;
+        private Button winterButton = null!;
+        private PictureBox artImage = null!;
+        private Label fallArrow = null!;
+        private Label winterArrow = null!;
         private string selectedSemester = "";
-
-
+        private string studentId = null!;
 
 
         public SemesterSelectionForm()
         {
+            studentId = Session.StudentID ?? "";
             InitializeComponent();
         }
 
         private void InitializeComponent()
         {
-            this.leftPanel = new Panel();
-            this.rightPanel = new Panel();
-            this.logo = new PictureBox();
-            this.secureCourseLabel = new Label();
-            this.welcomeLabel = new Label();
-            this.instructionLabel = new Label();
-            this.fallButton = new Button();
-            this.winterButton = new Button();
-            this.artImage = new PictureBox();
-
-            // Form settings
             this.ClientSize = new Size(1440, 1024);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -47,62 +38,75 @@ namespace CMPT_391_Project_01
             this.Text = "Select Semester";
             this.BackColor = Color.White;
 
-            // Left Panel
-            this.leftPanel.Size = new Size(720, 1024);
-            this.leftPanel.Location = new Point(0, 0);
-            this.leftPanel.BackColor = Color.White;
+            // LEFT PANEL
+            leftPanel = new Panel
+            {
+                Size = new Size(720, 1024),
+                Location = new Point(0, 0),
+                BackColor = Color.White
+            };
 
-            // Logo
-            this.logo.Size = new Size(64, 64);
-            this.logo.Location = new Point(328, 80);
-            this.logo.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.logo.Image = Image.FromFile("logo.jpg");
+            logo = new PictureBox
+            {
+                Size = new Size(64, 64),
+                Location = new Point(328, 80),
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Image = Image.FromFile("logo.jpg")
+            };
 
-            // SecureCourse Label
-            this.secureCourseLabel.Text = "SecureCourse";
-            this.secureCourseLabel.Font = new Font("Georgia", 20F, FontStyle.Bold);
-            this.secureCourseLabel.ForeColor = Color.FromArgb(11, 35, 94);
-            this.secureCourseLabel.AutoSize = true;
-            this.secureCourseLabel.Location = new Point(290, 150);
+            secureCourseLabel = new Label
+            {
+                Text = "SecureCourse",
+                Font = new Font("Georgia", 20F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                AutoSize = true,
+                Location = new Point(290, 150)
+            };
 
-            // Welcome Label
-            this.welcomeLabel.Text = "Hello Kelvin Yeboah!";
-            this.welcomeLabel.Font = new Font("Segoe UI", 26F, FontStyle.Bold);
-            this.welcomeLabel.ForeColor = Color.FromArgb(11, 35, 94);
-            this.welcomeLabel.AutoSize = true;
-            this.welcomeLabel.Location = new Point(160, 240);
+            welcomeLabel = new Label
+            {
+                Text = $"Hello {GetStudentName(studentId)}!",
+                Font = new Font("Segoe UI", 26F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                AutoSize = true,
+                Location = new Point(160, 240)
+            };
 
-            // Instruction Label
-            this.instructionLabel.Text = "Select the semester you\nwish to enrol in";
-            this.instructionLabel.Font = new Font("Segoe UI", 14F);
-            this.instructionLabel.ForeColor = Color.FromArgb(11, 35, 94);
-            this.instructionLabel.AutoSize = true;
-            this.instructionLabel.Location = new Point(160, 310);
+            instructionLabel = new Label
+            {
+                Text = "Select the semester you\nwish to enrol in",
+                Font = new Font("Segoe UI", 14F),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                AutoSize = true,
+                Location = new Point(160, 310)
+            };
 
-            // Fall Button
-            this.fallButton.Text = "FALL\n2025–2026 academic year";
-            this.fallButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            this.fallButton.ForeColor = Color.FromArgb(11, 35, 94);
-            this.fallButton.BackColor = Color.FromArgb(245, 248, 250);
-            this.fallButton.FlatStyle = FlatStyle.Flat;
-            this.fallButton.FlatAppearance.BorderSize = 0;
-            this.fallButton.Size = new Size(360, 80);
-            this.fallButton.Location = new Point(160, 400);
-            this.fallButton.TextAlign = ContentAlignment.MiddleLeft;
-            this.fallButton.Click += new EventHandler(FallButton_Click);
+            fallButton = new Button
+            {
+                Text = "FALL\n2025–2026 academic year",
+                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                BackColor = Color.FromArgb(245, 248, 250),
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(360, 80),
+                Location = new Point(160, 400),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            fallButton.FlatAppearance.BorderSize = 0;
+            fallButton.Click += FallButton_Click;
 
-            // Arrow inside Fall Button
-            this.fallArrow = new Label();
-            fallArrow.Text = ">";
-            fallArrow.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
-            fallArrow.ForeColor = Color.FromArgb(11, 35, 94);
-            fallArrow.BackColor = Color.Transparent;
-            fallArrow.AutoSize = true;
-            fallArrow.Location = new Point(this.fallButton.Width - 40, 25);
-            fallArrow.Click += new EventHandler(FallButton_Click);
-            this.fallButton.Controls.Add(fallArrow);
+            fallArrow = new Label
+            {
+                Text = ">",
+                Font = new Font("Segoe UI", 20F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                BackColor = Color.Transparent,
+                AutoSize = true,
+                Location = new Point(fallButton.Width - 40, 25)
+            };
+            fallArrow.Click += FallButton_Click;
+            fallButton.Controls.Add(fallArrow);
 
-            // On hover effect for Fall
             fallButton.MouseEnter += (s, e) =>
             {
                 if (fallButton.ForeColor != Color.White)
@@ -112,7 +116,6 @@ namespace CMPT_391_Project_01
                     fallArrow.ForeColor = Color.White;
                 }
             };
-
             fallButton.MouseLeave += (s, e) =>
             {
                 if (selectedSemester != "fall")
@@ -123,30 +126,32 @@ namespace CMPT_391_Project_01
                 }
             };
 
-            // Winter Button
-            this.winterButton.Text = "WINTER\n2025–2026 academic year";
-            this.winterButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            this.winterButton.ForeColor = Color.FromArgb(11, 35, 94);
-            this.winterButton.BackColor = Color.FromArgb(245, 248, 250);
-            this.winterButton.FlatStyle = FlatStyle.Flat;
-            this.winterButton.FlatAppearance.BorderSize = 0;
-            this.winterButton.Size = new Size(360, 80);
-            this.winterButton.Location = new Point(160, 500);
-            this.winterButton.TextAlign = ContentAlignment.MiddleLeft;
-            this.winterButton.Click += new EventHandler(WinterButton_Click);
+            winterButton = new Button
+            {
+                Text = "WINTER\n2025–2026 academic year",
+                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                BackColor = Color.FromArgb(245, 248, 250),
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(360, 80),
+                Location = new Point(160, 500),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            winterButton.FlatAppearance.BorderSize = 0;
+            winterButton.Click += WinterButton_Click;
 
-            // Arrow inside Winter Button
-            this.winterArrow = new Label();
-            winterArrow.Text = ">";
-            winterArrow.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
-            winterArrow.ForeColor = Color.FromArgb(11, 35, 94);
-            winterArrow.BackColor = Color.Transparent;
-            winterArrow.AutoSize = true;
-            winterArrow.Location = new Point(this.winterButton.Width - 40, 25);
-            winterArrow.Click += new EventHandler(WinterButton_Click);
-            this.winterButton.Controls.Add(winterArrow);
+            winterArrow = new Label
+            {
+                Text = ">",
+                Font = new Font("Segoe UI", 20F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                BackColor = Color.Transparent,
+                AutoSize = true,
+                Location = new Point(winterButton.Width - 40, 25)
+            };
+            winterArrow.Click += WinterButton_Click;
+            winterButton.Controls.Add(winterArrow);
 
-            // On hover effect for winter
             winterButton.MouseEnter += (s, e) =>
             {
                 if (winterButton.ForeColor != Color.White)
@@ -156,7 +161,6 @@ namespace CMPT_391_Project_01
                     winterArrow.ForeColor = Color.White;
                 }
             };
-
             winterButton.MouseLeave += (s, e) =>
             {
                 if (selectedSemester != "winter")
@@ -167,37 +171,80 @@ namespace CMPT_391_Project_01
                 }
             };
 
+            Button logoutButton = new Button
+            {
+                Text = "LOGOUT",
+                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(11, 35, 94),
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(100, 50),
+                Location = new Point(160, 600)
+            };
+            logoutButton.FlatAppearance.BorderSize = 0;
+            logoutButton.Click += LogoutButton_Click;
 
-            // Add left controls
-            this.leftPanel.Controls.Add(this.logo);
-            this.leftPanel.Controls.Add(this.secureCourseLabel);
-            this.leftPanel.Controls.Add(this.welcomeLabel);
-            this.leftPanel.Controls.Add(this.instructionLabel);
-            this.leftPanel.Controls.Add(this.fallButton);
-            this.leftPanel.Controls.Add(this.winterButton);
+            leftPanel.Controls.Add(logoutButton);
 
-            // Right Panel (Image)
-            this.rightPanel.Size = new Size(720, 1024);
-            this.rightPanel.Location = new Point(720, 0);
-            this.rightPanel.BackColor = Color.White;
 
-            // Art Image
-            this.artImage.Size = new Size(720, 1024);
-            this.artImage.Location = new Point(0, 0);
-            this.artImage.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.artImage.Image = Image.FromFile("abstract_art.jpg");
+            leftPanel.Controls.Add(logo);
+            leftPanel.Controls.Add(secureCourseLabel);
+            leftPanel.Controls.Add(welcomeLabel);
+            leftPanel.Controls.Add(instructionLabel);
+            leftPanel.Controls.Add(fallButton);
+            leftPanel.Controls.Add(winterButton);
 
-            this.rightPanel.Controls.Add(this.artImage);
+            // RIGHT PANEL
+            rightPanel = new Panel
+            {
+                Size = new Size(720, 1024),
+                Location = new Point(720, 0),
+                BackColor = Color.White
+            };
 
-            // Add panels to form
-            this.Controls.Add(this.leftPanel);
-            this.Controls.Add(this.rightPanel);
+            artImage = new PictureBox
+            {
+                Size = new Size(720, 1024),
+                Location = new Point(0, 0),
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Image = Image.FromFile("abstract_art.jpg")
+            };
+            rightPanel.Controls.Add(artImage);
+
+            this.Controls.Add(leftPanel);
+            this.Controls.Add(rightPanel);
+        }
+
+        private string GetStudentName(string studentId)
+        {
+            string name = "Student";
+
+            try
+            {
+                using var conn = new SqlConnection("Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;");
+                conn.Open();
+
+                using var cmd = new SqlCommand("GetStudentFullName", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@StudentID", studentId);
+
+                var result = cmd.ExecuteScalar();
+                if (result is not null && result != DBNull.Value)
+                {
+                    name = result?.ToString() ?? "Student";
+                }
+            }
+            catch
+            {
+                name = "Student";
+            }
+
+            return name ?? "Student";
         }
 
         private void FallButton_Click(object? sender, EventArgs e)
         {
             selectedSemester = "fall";
-
             fallButton.BackColor = Color.FromArgb(11, 35, 94);
             fallButton.ForeColor = Color.White;
             fallArrow.ForeColor = Color.White;
@@ -207,14 +254,13 @@ namespace CMPT_391_Project_01
             winterArrow.ForeColor = Color.FromArgb(11, 35, 94);
 
             this.Hide();
-            CourseSearchForm courseSearch = new CourseSearchForm("fall");
+            var courseSearch = new CourseSearchForm("fall");
             courseSearch.Show();
         }
 
         private void WinterButton_Click(object? sender, EventArgs e)
         {
             selectedSemester = "winter";
-
             winterButton.BackColor = Color.FromArgb(11, 35, 94);
             winterButton.ForeColor = Color.White;
             winterArrow.ForeColor = Color.White;
@@ -224,9 +270,27 @@ namespace CMPT_391_Project_01
             fallArrow.ForeColor = Color.FromArgb(11, 35, 94);
 
             this.Hide();
-            CourseSearchForm courseSearch = new CourseSearchForm("winter");
+            var courseSearch = new CourseSearchForm("winter");
             courseSearch.Show();
         }
+        private void LogoutButton_Click(object? sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to logout?",
+                "Confirm Logout",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                Session.StudentID = null;
+                var loginForm = new Form1();
+                loginForm.Show();
+                this.Close();
+            }
+        }
+
 
     }
 }

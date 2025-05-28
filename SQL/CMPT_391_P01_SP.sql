@@ -54,8 +54,22 @@ BEGIN
         WHERE S.CourseID = C.CourseID AND S.Semester = @Semester
     )
     AND (
-        C.courseLabel + ' ' + CAST(C.CourseID AS VARCHAR) LIKE @Keyword
+        (C.courseLabel + ' ' + CAST(C.CourseID AS VARCHAR(10))) LIKE @Keyword
         OR C.courseName LIKE @Keyword
     )
     ORDER BY C.CourseID;
-END;
+END
+
+
+
+--Gets Student name
+GO
+CREATE OR ALTER PROCEDURE GetStudentFullName
+    @StudentID INT
+AS
+BEGIN
+    SELECT first_name + ' ' + last_name AS FullName
+    FROM Student
+    WHERE StudentID = @StudentID;
+END
+
