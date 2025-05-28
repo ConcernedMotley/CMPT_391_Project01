@@ -52,13 +52,13 @@ namespace CMPT_391_Project_01
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            logo = new PictureBox
-            {
-                Size = new Size(64, 64),
-                Location = new Point(100, 50),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Image = Image.FromFile("logo.jpg")
-            };
+            //logo = new PictureBox
+            //{
+            //    Size = new Size(64, 64),
+            //    Location = new Point(100, 50),
+            //    SizeMode = PictureBoxSizeMode.StretchImage,
+            //    Image = Image.FromFile("logo.jpg")
+            //};
 
             navRegistration = new Button
             {
@@ -109,13 +109,13 @@ namespace CMPT_391_Project_01
                 AutoSize = true
             };
 
-            profilePic = new PictureBox
-            {
-                Size = new Size(40, 40),
-                Location = new Point(1076, 20),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Image = Image.FromFile("profile.jpg")
-            };
+            //profilePic = new PictureBox
+            //{
+            //    Size = new Size(40, 40),
+            //    Location = new Point(1076, 20),
+            //    SizeMode = PictureBoxSizeMode.StretchImage,
+            //    Image = Image.FromFile("profile.jpg")
+            //};
 
             userNameLabel = new Label
             {
