@@ -78,8 +78,8 @@ namespace CMPT_391_Project_01
                 Location = new Point(16, 120)
             };
 
-            string[] headers = { "Option", "Section", "Date & Times", "Room", "Instructor", "Seats", "Select" };
-            int[] positions = { 10, 80, 300, 520, 640, 780, 950 };
+            string[] headers = { "Option", "Section", "Date & Times", "Room", "Building", "Instructor", "Seats", "Select" };
+            int[] positions = { 10, 60, 150, 370, 460, 590, 720, 900 };
 
             for (int i = 0; i < headers.Length; i++)
             {
@@ -145,20 +145,14 @@ namespace CMPT_391_Project_01
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
+
                 string sql = @"
-                    SELECT S.SectionID, S.CrseName, ST.DayOfWeek, ST.StartTime, ST.EndTime, 
-                           CR.Building, CR.RoomNumber, 
-                           'John Doe' AS Instructor, -- Placeholder
-                           S.Capicity AS TotalSeats,
-                           S.Capicity - COUNT(T.StudentID) AS AvailableSeats
-                    FROM Section S
-                    JOIN Sect_TimeSlot ST ON S.SectionID = ST.SectionID
-                    JOIN Classroom CR ON S.ClassroomID = CR.ClassroomID
-                    LEFT JOIN Takes T ON S.SectionID = T.SectionID
-                    WHERE S.CourseID = @CourseID AND S.Semester = @Semester
-                    GROUP BY S.SectionID, S.CrseName, ST.DayOfWeek, ST.StartTime, ST.EndTime, CR.Building, CR.RoomNumber, S.Capicity
-                    ORDER BY ST.DayOfWeek, ST.StartTime;
-                ";
+            SELECT SectionID, CrseName, DayOfWeek, StartTime, EndTime,
+                           Building, RoomNumber, InstructorName, TotalSeats, EnrolledStudents
+                    FROM vw_SectionAvailability
+                    WHERE CourseID = @CourseID AND Semester = @Semester
+                    ORDER BY DayOfWeek, StartTime;
+        ";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
@@ -167,33 +161,39 @@ namespace CMPT_391_Project_01
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     int optionNum = 1;
+
                     while (reader.Read())
                     {
                         string sectionId = reader["SectionID"].ToString();
-                        string section = reader["CrseName"].ToString();
+                        string section = reader["SectionID"].ToString();
                         string day = reader["DayOfWeek"].ToString();
-                        string start = reader["StartTime"].ToString();
-                        string end = reader["EndTime"].ToString();
-                        string room = reader["Building"] + "-" + reader["RoomNumber"];
-                        string instructor = reader["Instructor"].ToString();
+                        string start = DateTime.Parse(reader["StartTime"].ToString()).ToString("h:mm tt");
+                        string end = DateTime.Parse(reader["EndTime"].ToString()).ToString("h:mm tt");
+                        string roomNumber = reader["RoomNumber"].ToString().Trim();
+                        string building = reader["Building"].ToString();
+                        string instructor = reader["InstructorName"].ToString();
+
                         int totalSeats = Convert.ToInt32(reader["TotalSeats"]);
-                        int availableSeats = Convert.ToInt32(reader["AvailableSeats"]);
+                        int enrolled = Convert.ToInt32(reader["EnrolledStudents"]);
+                        int availableSeats = totalSeats - enrolled;
 
                         RadioButton radio = new RadioButton
                         {
                             Tag = sectionId,
                             Location = new Point(950, 20),
-                            AutoSize = true
+                            AutoSize = true,
+                            Enabled = availableSeats > 0
                         };
                         radio.CheckedChanged += (s, e) =>
                         {
-                            if (radio.Checked)
+                            var currentRadio = (RadioButton)s;
+
+                            if (currentRadio.Checked)
                             {
-                                // Deselect the previously selected radio button
-                                if (selectedRadio != null && selectedRadio != radio)
+                                if (selectedRadio != null && selectedRadio != currentRadio)
                                     selectedRadio.Checked = false;
 
-                                selectedRadio = radio;
+                                selectedRadio = currentRadio;
                             }
                         };
 
@@ -201,17 +201,20 @@ namespace CMPT_391_Project_01
                         Panel row = new Panel
                         {
                             Size = new Size(1100, 60),
-                            BackColor = Color.White,
+                            BackColor = availableSeats == 0 ? Color.LightGray : Color.White,
                             BorderStyle = BorderStyle.FixedSingle
                         };
 
-                        row.Controls.Add(new Label { Text = optionNum.ToString(), Location = new Point(10, 20), AutoSize = true });
-                        row.Controls.Add(new Label { Text = section, Location = new Point(80, 20), Size = new Size(200, 20) });
-                        row.Controls.Add(new Label { Text = day + " " + start + " to " + end, Location = new Point(300, 20), Size = new Size(200, 20) });
-                        row.Controls.Add(new Label { Text = room, Location = new Point(520, 20), Size = new Size(100, 20) });
-                        row.Controls.Add(new Label { Text = instructor, Location = new Point(640, 20), Size = new Size(120, 20) });
-                        row.Controls.Add(new Label { Text = $"Total: {totalSeats} / Available: {availableSeats}", Location = new Point(780, 20), AutoSize = true });
+                        row.Controls.Add(new Label { Text = optionNum.ToString(), Location = new Point(10, 20), Size = new Size(40, 20) });
+                        row.Controls.Add(new Label { Text = $"Section {sectionId}", Location = new Point(60, 20), Size = new Size(80, 20) });
+                        row.Controls.Add(new Label { Text = $"{day} {start} to {end}", Location = new Point(150, 20), Size = new Size(210, 20) });
+                        row.Controls.Add(new Label { Text = roomNumber, Location = new Point(370, 20), Size = new Size(80, 20) });
+                        row.Controls.Add(new Label { Text = building, Location = new Point(460, 20), Size = new Size(120, 20) });
+                        row.Controls.Add(new Label { Text = instructor, Location = new Point(590, 20), Size = new Size(120, 20) });
+                        row.Controls.Add(new Label { Text = $"Total: {totalSeats} / Available: {availableSeats}", Location = new Point(720, 20), Size = new Size(160, 20) });
+                        radio.Location = new Point(900, 20);
                         row.Controls.Add(radio);
+
 
                         sectionListPanel.Controls.Add(row);
                         optionNum++;
@@ -219,6 +222,8 @@ namespace CMPT_391_Project_01
                 }
             }
         }
+
+
 
         private void RegisterButton_Click(object sender, EventArgs e)
         {
@@ -243,12 +248,12 @@ namespace CMPT_391_Project_01
                     using (SqlConnection conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
-                        using (SqlCommand cmd = new SqlCommand("RegisterStudentToSection", conn))
+                        using (SqlCommand cmd = new SqlCommand("dbo.RegisterStudentToSection", conn))
                         {
                             cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@StudentID", studentId);
-                            cmd.Parameters.AddWithValue("@SectionID", selectedSectionId);
-                            cmd.Parameters.AddWithValue("@CourseID", courseId);
+                            cmd.Parameters.AddWithValue("@StudentID", Convert.ToInt64(studentId));
+                            cmd.Parameters.AddWithValue("@SectionID", Convert.ToInt32(selectedSectionId));
+                            cmd.Parameters.AddWithValue("@CourseID", Convert.ToInt32(courseId));
                             cmd.ExecuteNonQuery();
                         }
                     }

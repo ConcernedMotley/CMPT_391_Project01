@@ -33,14 +33,22 @@ DROP TABLE IF EXISTS Classroom;
 DROP TABLE IF EXISTS Student;
 DROP TABLE IF EXISTS Section;
 DROP TABLE IF EXISTS Course;
+DROP TABLE IF EXISTS Instructor;
 
+
+CREATE TABLE Instructor (
+    InstructorID INT PRIMARY KEY,
+    FirstName NVARCHAR(20),
+    LastName NVARCHAR(20),
+    Department NVARCHAR(50)
+);
 
 --Student (student_id, first_name, last_name, department) - Ethan
 CREATE TABLE Student (
     StudentID bigint PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    department VARCHAR(100)
+    first_name VARCHAR(20),
+    last_name VARCHAR(20),
+    department VARCHAR(50)
 );
 
 --Course (course_id,courseLabel, courseName, credits, prereq) - Ethan
@@ -48,7 +56,7 @@ CREATE TABLE Student (
 CREATE TABLE Course (
     CourseID INT PRIMARY KEY,
     courseLabel VARCHAR(4),      -- e.g., 'CMPT', 'ENGL'
-    courseName VARCHAR(100),
+    courseName VARCHAR(50),
     credits INT,
     prereq INT
 );
@@ -61,6 +69,7 @@ CREATE TABLE Classroom (
     Capacity INT NOT NULL,
 );
 
+
 --Section (section_id, year, semester, course_id, courseName, ClassroomID, Capicity) - Sankalp
 CREATE TABLE Section(
 	SectionID int NOT NULL PRIMARY KEY,
@@ -68,10 +77,12 @@ CREATE TABLE Section(
 	CourseID int NOT NULL,
 	CrseYear int NOT NULL,
 	Semester varchar(10) NOT NULL,
-	CrseName varchar(40) NOT NULL,
-	Capicity INT NOT NULL,
+	CrseName varchar(50) NOT NULL,
+	Capacity INT NOT NULL,
+    InstructorID INT,
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
-	FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID)
+	FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID),
+    FOREIGN KEY (InstructorID) REFERENCES Instructor(InstructorID)
 );
 
 -- StudentCredentials (student_id, username, studentPassword) - Sankalp
@@ -86,7 +97,7 @@ CREATE TABLE StudentCredentials (
 CREATE TABLE Takes (
 	CourseID int NOT NULL,
 	SectionID int NOT NULL,
-	Grade float null,
+	Grade VARCHAR (2) null,
 	StudentID bigint NOT NULL,
 	CONSTRAINT PK_Takes PRIMARY KEY (CourseID, SectionID, StudentID),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
@@ -111,7 +122,7 @@ CREATE TABLE Cart (
 	SectionID INT,
 	StudentID BIGINT,
 	CourseID INT,
-	CourseName VARCHAR(100),
+	CourseName VARCHAR(50),
 	CONSTRAINT PK_Cart PRIMARY KEY (SectionID, StudentID, CourseID, CourseName),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
 	FOREIGN KEY (StudentID) REFERENCES Student(StudentID),

@@ -1,6 +1,5 @@
 USE CMPT_391_P01;
 
-
 --Delete old records
 DELETE FROM Cart;
 DELETE FROM Sect_TimeSlot;
@@ -10,6 +9,16 @@ DELETE FROM Section;
 DELETE FROM Course;
 DELETE FROM Student;
 DELETE FROM Classroom;
+DELETE FROM Instructor;
+
+
+-- INSERT INTO Instructor
+INSERT INTO Instructor (InstructorID, FirstName, LastName, Department)
+VALUES 
+(1, 'John', 'Doe', 'Computer Science'),
+(2, 'Emily', 'Watson', 'Computer Science'),
+(3, 'Raj', 'Patel', 'Computer Science');
+
 
 -- INSERT INTO Student
 INSERT INTO Student (StudentID, first_name, last_name, department)
@@ -138,36 +147,38 @@ VALUES
 (496, 'CMPT', 'Capstone Project', 3, 395);
 
 -- Insert Section
-INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID, Capicity)
+INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID,Capacity,InstructorID)
 VALUES
-(1, 101, 2024, 'Fall', 'Intro to Programming', 1, 50),
-(2, 200, 2024, 'Fall', 'Data Structures', 2, 40),
-(3, 204, 2024, 'Winter', 'Algorithms', 3, 35),
-(4, 229, 2024, 'Winter', 'Computer Architecture', 4, 50),
-(5, 360, 2025, 'Fall', 'Operating Systems', 5, 45),
-(6, 291, 2024, 'Fall', 'Databases', 6, 60),
-(7, 395, 2025, 'Winter', 'Software Engineering', 7, 50),
-(8, 315, 2024, 'Spring', 'Web Development', 8, 30),
-(9, 305, 2025, 'Spring', 'Mobile App Development', 9, 25),
-(10, 255, 2025, 'Fall', 'Machine Learning', 10, 40),
-(11, 355, 2025, 'Winter', 'Artificial Intelligence', 11, 35),
-(12, 361, 2025, 'Fall', 'Networks', 12, 45),
-(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals', 13, 40),
-(14, 250, 2024, 'Fall', 'Human-Computer Interaction', 14, 35),
-(15, 272, 2024, 'Fall', 'Discrete Math', 15, 50),
-(16, 104, 2024, 'Spring', 'Theory of Computation', 16, 30),
-(17, 391, 2025, 'Spring', 'Advanced Databases', 17, 25),
-(18, 299, 2025, 'Winter', 'Cloud Computing', 18, 50),
-(19, 497, 2025, 'Spring', 'DevOps Practices', 19, 35),
-(20, 496, 2025, 'Spring', 'Capstone Project', 20, 40);
+(1, 101, 2024, 'Fall', 'Intro to Programming', 1, 50,3),
+(2, 200, 2024, 'Fall', 'Data Structures', 2, 40,1),
+(3, 204, 2024, 'Winter', 'Algorithms', 3, 35,2),
+(4, 229, 2024, 'Winter', 'Computer Architecture', 4, 50,3),
+(5, 360, 2025, 'Fall', 'Operating Systems', 5, 45,2),
+(6, 291, 2024, 'Fall', 'Databases', 6, 60,1),
+(7, 395, 2025, 'Winter', 'Software Engineering', 7, 50,3),
+(8, 315, 2024, 'Spring', 'Web Development', 8, 30,2),
+(9, 305, 2025, 'Spring', 'Mobile App Development', 9, 25,1),
+(10, 255, 2025, 'Fall', 'Machine Learning', 10, 40,2),
+(11, 355, 2025, 'Winter', 'Artificial Intelligence', 11, 35,3),
+(12, 361, 2025, 'Fall', 'Networks', 12, 45,2),
+(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals', 13, 40,1),
+(14, 250, 2024, 'Fall', 'Human-Computer Interaction', 14, 35,1),
+(15, 272, 2024, 'Fall', 'Discrete Math', 15, 50,2),
+(16, 104, 2024, 'Spring', 'Theory of Computation', 16, 30,3),
+(17, 391, 2025, 'Spring', 'Advanced Databases', 17, 25,2),
+(18, 299, 2025, 'Winter', 'Cloud Computing', 18, 50,3),
+(19, 497, 2025, 'Spring', 'DevOps Practices', 19, 35,2),
+(20, 496, 2025, 'Spring', 'Capstone Project', 20, 40,1),
+(21, 101, 2024, 'Fall', 'Intro to Programming', 2, 50,3),
+(22, 101, 2024, 'Fall', 'Intro to Programming', 3, 50,3);
 
 
 -- Sect timeslots
 INSERT INTO Sect_TimeSlot (TimeSlotID, SectionID, StartTime, EndTime, DayOfWeek)
 VALUES
 (1, 1, '09:00', '10:20', 'Monday'),
-(21, 1, '10:20', '11:50', 'Tuesday'),
-(22, 1, '10:20', '11:50', 'Monday'),
+(21, 21, '10:20', '11:50', 'Tuesday'),
+(22, 22, '10:20', '11:50', 'Monday'),
 (2, 2, '10:30', '11:50', 'Tuesday'),
 (3, 3, '13:00', '14:20', 'Wednesday'),
 (4, 4, '14:30', '15:50', 'Thursday'),
@@ -207,7 +218,6 @@ VALUES
 (5, 1000002, 360, 'Operating Systems'),
 
 -- Student 1000003 takes Web Dev, Software Eng (prereq satisfied)
-(1, 1000003, 101, 'Intro to Programming'),
 (2, 1000003, 200, 'Data Structures'),
 (7, 1000003, 395, 'Software Engineering'),
 (8, 1000003, 315, 'Web Development'),

@@ -1,7 +1,7 @@
 USE CMPT_391_P01;
 GO
 
-CREATE OR ALTER PROCEDURE RegisterStudentToSection
+CREATE OR ALTER PROCEDURE dbo.RegisterStudentToSection
     @StudentID BIGINT,
     @SectionID INT,
     @CourseID INT
@@ -38,6 +38,16 @@ BEGIN
         )
         BEGIN
             RAISERROR('You have already completed this course.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+        -- Check if already registered in same section
+        IF EXISTS (
+            SELECT 1 FROM Takes
+            WHERE StudentID = @StudentID AND SectionID = @SectionID
+        )
+        BEGIN
+            RAISERROR('You are already registered in this section.', 16, 1);
             ROLLBACK TRANSACTION;
             RETURN;
         END
