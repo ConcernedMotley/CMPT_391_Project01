@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Transactions;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
 
@@ -237,34 +238,33 @@ namespace CMPT_391_Project_01
 
             if (confirm == DialogResult.Yes)
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                try
                 {
-                    conn.Open();
-                    string sql = "INSERT INTO Takes (StudentID, SectionID) VALUES (@StudentID, @SectionID)";
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    using (SqlConnection conn = new SqlConnection(connectionString))
                     {
-                        cmd.Parameters.AddWithValue("@StudentID", studentId);
-                        cmd.Parameters.AddWithValue("@SectionID", selectedSectionId);
-                        try
+                        conn.Open();
+                        using (SqlCommand cmd = new SqlCommand("RegisterStudentToSection", conn))
                         {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@StudentID", studentId);
+                            cmd.Parameters.AddWithValue("@SectionID", selectedSectionId);
+                            cmd.Parameters.AddWithValue("@CourseID", courseId);
                             cmd.ExecuteNonQuery();
-                            MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            //  After registration, go back to CourseSearchForm
-                            Form parentForm = this.FindForm();
-                            parentForm.Hide();
-                            CourseSearchForm searchForm = new CourseSearchForm(semester);
-                            searchForm.Show();
-                        }
-                        catch (SqlException ex)
-                        {
-                            MessageBox.Show("Registration failed:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
 
-
+                    MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Redirect to CourseSearchForm
+                    Form parentForm = this.FindForm();
+                    parentForm.Hide();
+                    new CourseSearchForm(semester).Show();
+                }
+                catch (SqlException ex)
+                {
+                    MessageBox.Show(ex.Message, "Registration Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
+
     }
 }

@@ -86,9 +86,9 @@ CREATE TABLE StudentCredentials (
 CREATE TABLE Takes (
 	CourseID int NOT NULL,
 	SectionID int NOT NULL,
-	Grade float,
+	Grade float null,
 	StudentID bigint NOT NULL,
-	CONSTRAINT PK_Takes PRIMARY KEY (CourseID, SectionID, Grade, StudentID),
+	CONSTRAINT PK_Takes PRIMARY KEY (CourseID, SectionID, StudentID),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
 	FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
 	FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
