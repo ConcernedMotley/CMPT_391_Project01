@@ -56,7 +56,7 @@ namespace CMPT_391_Project_01
             this.logo.Size = new Size(64, 64);
             this.logo.Location = new Point(328, 80);
             this.logo.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.logo.Image = Image.FromFile("logo.jpg");
+            //this.logo.Image = Image.FromFile("logo.jpg");
 
             // SecureCourse Label
             this.secureCourseLabel.Text = "SecureCourse";
@@ -185,7 +185,7 @@ namespace CMPT_391_Project_01
             this.artImage.Size = new Size(720, 1024);
             this.artImage.Location = new Point(0, 0);
             this.artImage.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.artImage.Image = Image.FromFile("abstract_art.jpg");
+            //this.artImage.Image = Image.FromFile("abstract_art.jpg");
 
             this.rightPanel.Controls.Add(this.artImage);
 
