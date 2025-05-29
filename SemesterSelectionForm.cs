@@ -83,7 +83,7 @@ namespace CMPT_391_Project_01
 
             fallButton = new Button
             {
-                Text = "FALL\n2025–2026 academic year",
+                Text = "FALL\n2024–2025 academic year",
                 Font = new Font("Segoe UI", 14F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(11, 35, 94),
                 BackColor = Color.FromArgb(245, 248, 250),
@@ -128,7 +128,7 @@ namespace CMPT_391_Project_01
 
             winterButton = new Button
             {
-                Text = "WINTER\n2025–2026 academic year",
+                Text = "WINTER\n2025 academic year",
                 Font = new Font("Segoe UI", 14F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(11, 35, 94),
                 BackColor = Color.FromArgb(245, 248, 250),
@@ -254,8 +254,9 @@ namespace CMPT_391_Project_01
             winterArrow.ForeColor = Color.FromArgb(11, 35, 94);
 
             this.Hide();
-            var courseSearch = new CourseSearchForm("fall");
+            var courseSearch = new CourseSearchForm("fall", int.Parse(studentId));
             courseSearch.Show();
+
         }
 
         private void WinterButton_Click(object? sender, EventArgs e)
@@ -270,8 +271,9 @@ namespace CMPT_391_Project_01
             fallArrow.ForeColor = Color.FromArgb(11, 35, 94);
 
             this.Hide();
-            var courseSearch = new CourseSearchForm("winter");
+            var courseSearch = new CourseSearchForm("winter", int.Parse(studentId));
             courseSearch.Show();
+
         }
         private void LogoutButton_Click(object? sender, EventArgs e)
         {

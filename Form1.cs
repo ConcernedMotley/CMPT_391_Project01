@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
 
@@ -37,13 +38,10 @@ namespace CMPT_391_Project_01
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                string query = @"
-            SELECT StudentID 
-            FROM StudentCredentials 
-            WHERE Username = @Username AND StudentPassword = @Password";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand("sp_ValidateStudentLogin", conn))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Username", username);
                     cmd.Parameters.AddWithValue("@Password", password);
 

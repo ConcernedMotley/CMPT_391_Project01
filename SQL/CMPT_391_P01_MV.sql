@@ -1,6 +1,21 @@
-﻿USE CMPT_391_P01;
+﻿-- =============================================
+-- DATABASE: CMPT_391_P01
+--  MATERIALIZED VIEWS FOR COURSE REGISTRATION SYSTEM
+-- =============================================
+
+USE CMPT_391_P01;
 GO
 
+-- =============================================
+-- VIEW: vw_SectionAvailability
+-- PURPOSE: 
+--   Provides detailed information about each section,
+--   including timing, location, instructor, and seat availability.
+--
+-- NOTES:
+--   - Uses COUNT_BIG to support SCHEMABINDING.
+--   - Used to power section listing and registration forms.
+-- =============================================
 DROP VIEW IF EXISTS dbo.vw_SectionAvailability;
 GO
 
@@ -33,31 +48,16 @@ GROUP BY
     S.Capacity;
 GO
 
-
-
-
 -- =============================================
--- View: vw_SectionInstructor
--- Description: (Optional) Lists instructors assigned to each section
--- =============================================
--- CREATE OR ALTER VIEW dbo.vw_SectionInstructor
--- WITH SCHEMABINDING
--- AS
--- SELECT 
---     S.SectionID,
---     I.InstructorID,
---     I.FirstName,
---     I.LastName
--- FROM dbo.Section S
--- JOIN dbo.Instructor I ON S.InstructorID = I.InstructorID;
--- GO
-
--- CREATE UNIQUE CLUSTERED INDEX IX_vw_SectionInstructor_SectionID
--- ON dbo.vw_SectionInstructor (SectionID);
--- GO
--- =============================================
--- View: vw_StudentSchedule
--- Description: Shows detailed schedule for each student
+-- VIEW: vw_StudentSchedule
+-- PURPOSE:
+--   Displays a student's full class schedule including time and location.
+--
+-- USE CASE:
+--   Used to validate time conflicts during registration.
+--
+-- INDEX:
+--   Unique index ensures one entry per student/section combination.
 -- =============================================
 CREATE OR ALTER VIEW dbo.vw_StudentSchedule
 WITH SCHEMABINDING
@@ -83,8 +83,15 @@ ON dbo.vw_StudentSchedule(StudentID, SectionID);
 GO
 
 -- =============================================
--- View: vw_CourseCompletion
--- Description: Lists all completed courses by students
+-- VIEW: vw_CourseCompletion
+-- PURPOSE:
+--   Lists all courses that have been completed by students (Grade IS NOT NULL).
+--
+-- USE CASE:
+--   Used to validate prerequisite completion and display academic history.
+--
+-- INDEX:
+--   Ensures unique entries per student per course.
 -- =============================================
 CREATE OR ALTER VIEW dbo.vw_CourseCompletion
 WITH SCHEMABINDING

@@ -11,7 +11,6 @@ namespace CMPT_391_Project_01
     {
         private Panel? sidebar;
         private PictureBox? logo;
-        private Button? navRegistration;
 
         private Panel? header;
         private Label? titleLabel;
@@ -19,30 +18,32 @@ namespace CMPT_391_Project_01
         private Label? userRoleLabel;
         private PictureBox? profilePic;
         private Label? backArrow;
+        private readonly Form caller = null!;
 
-        private Panel mainContent;
+        private Panel mainContent = null!;
         private Panel? semesterPanel;
         private Label? semesterLabel;
         private LinkLabel? changeLink;
-        private TextBox searchTextBox;
+        private TextBox searchTextBox = null!;
         private Button? searchButton;
-        private FlowLayoutPanel resultsPanel;
+        private FlowLayoutPanel resultsPanel = null!;
+
+
 
         private string selectedSemester;
         private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
 
-        private readonly string studentId;
+        private readonly string studentId = null!;
 
 
-        public CourseSearchForm(string semester)
+        public CourseSearchForm(string semester, int studentId)
         {
             this.selectedSemester = semester;
-            this.studentId = Session.StudentID; 
+            this.studentId = studentId.ToString();
             InitializeComponent();
             RenderSearchResults("");
-
-
         }
+
         private string GetStudentName(string studentId)
         {
             string name = "Student";
@@ -66,6 +67,12 @@ namespace CMPT_391_Project_01
             }
             return name;
         }
+        private void viewClassesButton_Click(object? sender, EventArgs e)
+
+        {
+            ViewRegisteredClassesForm form = new ViewRegisteredClassesForm(Convert.ToInt32(Session.StudentID));
+            form.ShowDialog();
+        }
 
 
         private void InitializeComponent()
@@ -76,6 +83,7 @@ namespace CMPT_391_Project_01
             this.MaximizeBox = false;
             this.BackColor = Color.White;
             this.StartPosition = FormStartPosition.CenterScreen;
+
 
             sidebar = new Panel
             {
@@ -93,9 +101,9 @@ namespace CMPT_391_Project_01
                 Image = Image.FromFile("logo.jpg")
             };
 
-            navRegistration = new Button
+            Button viewClassesButton = new Button
             {
-                Text = "  Registration",
+                Text = "  View My Classes",
                 Font = new Font("Segoe UI", 12F, FontStyle.Regular),
                 ForeColor = Color.FromArgb(11, 35, 94),
                 BackColor = Color.Transparent,
@@ -104,10 +112,39 @@ namespace CMPT_391_Project_01
                 Location = new Point(42, 150),
                 TextAlign = ContentAlignment.MiddleLeft
             };
-            navRegistration.FlatAppearance.BorderSize = 0;
+            viewClassesButton.FlatAppearance.BorderSize = 0;
+
+            Button courseHistoryButton = new Button
+            {
+                Text = "  Course History",
+                Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                BackColor = Color.Transparent,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(180, 40),
+                Location = new Point(42, 200),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            courseHistoryButton.FlatAppearance.BorderSize = 0;
+
+
+            viewClassesButton.Click += (s, e) =>
+            {
+                var viewForm = new ViewRegisteredClassesForm(int.Parse(studentId)); // assuming studentId is string
+                viewForm.ShowDialog();
+            };
+
+            sidebar.Controls.Add(viewClassesButton);
 
             sidebar.Controls.Add(logo);
-            sidebar.Controls.Add(navRegistration);
+
+            courseHistoryButton.Click += (s, e) =>
+            {
+                var historyForm = new CourseHistoryForm(int.Parse(studentId)); // You’ll need to create this form
+                historyForm.ShowDialog();
+            };
+            sidebar.Controls.Add(courseHistoryButton);
+
 
             header = new Panel
             {
@@ -128,8 +165,14 @@ namespace CMPT_391_Project_01
             backArrow.Click += (s, e) =>
             {
                 this.Hide();
-                SemesterSelectionForm semesterForm = new SemesterSelectionForm();
-                semesterForm.Show();
+                if (caller != null)
+                {
+                    caller.Show(); // go back to previous form
+                }
+                else
+                {
+                    new SemesterSelectionForm().Show(); // fallback if no caller provided
+                }
             };
 
             titleLabel = new Label
@@ -292,9 +335,9 @@ namespace CMPT_391_Project_01
                     SqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        string rawCourseId = reader["CourseID"].ToString();         // Save course ID for later
-                        string courseLabel = reader["courseLabel"].ToString();      // Save course label for later
-                        string courseName = reader["courseName"].ToString();        // Save course name for later
+                        string rawCourseId = reader["CourseID"].ToString()!;
+                        string courseLabel = reader["courseLabel"].ToString()!;
+                        string courseName = reader["courseName"].ToString()!;
                         int classCount = Convert.ToInt32(reader["ClassCount"]);
 
                         string displayCourseId = courseLabel + " " + rawCourseId;
@@ -342,13 +385,24 @@ namespace CMPT_391_Project_01
 
                         card.Click += (s, e) =>
                         {
-                            mainContent.Controls.Clear();
-                            mainContent.Controls.Add(new CourseSectionOptionsControl(
+                            var sectionControl = new CourseSectionOptionsControl(
                                 rawCourseId,
                                 courseLabel,
                                 courseName,
                                 selectedSemester
-                            ));
+                            );
+
+                            sectionControl.BackRequested += (sender, args) =>
+                            {
+                                mainContent.Controls.Clear();
+                                mainContent.Controls.Add(semesterPanel);
+                                mainContent.Controls.Add(searchTextBox);
+                                mainContent.Controls.Add(searchButton);
+                                mainContent.Controls.Add(resultsPanel);
+                            };
+
+                            mainContent.Controls.Clear();
+                            mainContent.Controls.Add(sectionControl);
                         };
                     }
                 }

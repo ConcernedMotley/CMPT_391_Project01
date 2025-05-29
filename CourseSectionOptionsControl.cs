@@ -16,6 +16,8 @@ namespace CMPT_391_Project_01
         private readonly string courseName;
         private readonly string semester;
         private readonly string studentId = Session.StudentID;
+        
+
 
         private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
 
@@ -24,19 +26,28 @@ namespace CMPT_391_Project_01
         private Label courseInfoLabel;
         private FlowLayoutPanel sectionListPanel;
         private Button registerButton;
+        private Label prereqLabel;
+        private LinkLabel togglePrereqLink;
+        private bool prereqExpanded = false;
+        public event EventHandler BackRequested;
+
+
+
 
         private RadioButton selectedRadio = null;
 
-        public CourseSectionOptionsControl(string courseId, string courseLabel, string courseName, string semester)
+
+        public CourseSectionOptionsControl(string courseId, string label, string name, string semester)
         {
             this.courseId = courseId;
-            this.courseLabel = courseLabel;
-            this.courseName = courseName;
+            this.courseLabel = label;
+            this.courseName = name;
             this.semester = semester;
 
             this.Size = new Size(1176, 850);
             this.BackColor = Color.White;
             InitializeUI();
+            LoadPrerequisite(prereqLabel);
             LoadSections();
         }
 
@@ -66,8 +77,45 @@ namespace CMPT_391_Project_01
                 AutoSize = true
             };
 
+            // Toggle link
+            togglePrereqLink = new LinkLabel
+            {
+                Text = "Show Prerequisites",
+                Font = new Font("Segoe UI", 9F, FontStyle.Italic),
+                LinkColor = Color.Blue,
+                Location = new Point(750, 8),
+                AutoSize = true,
+                Cursor = Cursors.Hand
+            };
+            togglePrereqLink.Click += TogglePrerequisite;
+
+            // Toggle link
+            togglePrereqLink = new LinkLabel
+            {
+                Text = "Show Prerequisites",
+                Font = new Font("Segoe UI", 9F, FontStyle.Italic),
+                LinkColor = Color.Blue,
+                Location = new Point(900, 45),
+                AutoSize = true
+            };
+            togglePrereqLink.Click += TogglePrerequisite;
+
+            // Prereq label
+            prereqLabel = new Label
+            {
+                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
+                ForeColor = Color.Black,
+                Location = new Point(0, 80),
+                Size = new Size(1100, 20),
+                Visible = false
+            };
+
+            headerPanel.Controls.Add(togglePrereqLink);
+            headerPanel.Controls.Add(prereqLabel);
+
+
             headerPanel.Controls.Add(titleLabel);
-            headerPanel.Controls.Add(courseInfoLabel);
+            headerPanel.Controls.Add(courseInfoLabel);;
             this.Controls.Add(headerPanel);
 
             // Column header row
@@ -130,14 +178,20 @@ namespace CMPT_391_Project_01
 
             backButton.Click += (s, e) =>
             {
-                Form parentForm = this.FindForm();
-                parentForm.Hide();
-                new CourseSearchForm(semester).Show();
+                BackRequested?.Invoke(this, EventArgs.Empty);
             };
+
 
 
             this.Controls.Add(backButton);
 
+        }
+
+        private void TogglePrerequisite(object sender, EventArgs e)
+        {
+            prereqExpanded = !prereqExpanded;
+            prereqLabel.Visible = prereqExpanded;
+            togglePrereqLink.Text = prereqExpanded ? "Hide Prerequisites" : "Show Prerequisites";
         }
 
         private void LoadSections()
@@ -146,16 +200,9 @@ namespace CMPT_391_Project_01
             {
                 conn.Open();
 
-                string sql = @"
-            SELECT SectionID, CrseName, DayOfWeek, StartTime, EndTime,
-                           Building, RoomNumber, InstructorName, TotalSeats, EnrolledStudents
-                    FROM vw_SectionAvailability
-                    WHERE CourseID = @CourseID AND Semester = @Semester
-                    ORDER BY DayOfWeek, StartTime;
-        ";
-
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                using (SqlCommand cmd = new SqlCommand("dbo.GetCourseSections", conn))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CourseID", courseId);
                     cmd.Parameters.AddWithValue("@Semester", semester);
 
@@ -223,7 +270,38 @@ namespace CMPT_391_Project_01
             }
         }
 
+        private void LoadPrerequisite(Label label)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand("GetFormattedCoursePrerequisites", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CourseID", courseId);
 
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        List<string> prereqs = new List<string>();
+                        while (reader.Read())
+                        {
+                            prereqs.Add(reader["FormattedCourse"].ToString());
+                        }
+
+                        if (prereqs.Count > 0)
+                        {
+                            label.Text = "Prerequisites: " + string.Join(", ", prereqs);
+                            togglePrereqLink.Visible = true;
+                        }
+                        else
+                        {
+                            label.Text = "Prerequisites: None";
+                            togglePrereqLink.Visible = false;
+                        }
+                    }
+                }
+            }
+        }
 
         private void RegisterButton_Click(object sender, EventArgs e)
         {
@@ -261,15 +339,26 @@ namespace CMPT_391_Project_01
                     MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     // Redirect to CourseSearchForm
                     Form parentForm = this.FindForm();
-                    parentForm.Hide();
-                    new CourseSearchForm(semester).Show();
+                    parentForm.Hide(); 
                 }
                 catch (SqlException ex)
                 {
-                    MessageBox.Show(ex.Message, "Registration Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (ex.Message.Contains("prerequisite"))
+                    {
+                        MessageBox.Show("You must complete the prerequisite before registering.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    else if (ex.Message.Contains("Schedule conflict"))
+                    {
+                        MessageBox.Show("There is a scheduling conflict with another class.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    else
+                    {
+                        MessageBox.Show(ex.Message, "Registration Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-            }
-        }
 
+            }
+
+        }
     }
 }
