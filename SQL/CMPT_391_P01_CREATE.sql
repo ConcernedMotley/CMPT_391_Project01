@@ -147,6 +147,7 @@ CREATE TABLE Cart (
 	StudentID BIGINT,
 	CourseID INT,
 	CourseName VARCHAR(50),
+    Semester VARCHAR(20),
 	CONSTRAINT PK_Cart PRIMARY KEY (SectionID, StudentID, CourseID, CourseName),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
 	FOREIGN KEY (StudentID) REFERENCES Student(StudentID),

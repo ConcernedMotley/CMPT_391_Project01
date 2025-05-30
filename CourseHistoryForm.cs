@@ -7,21 +7,30 @@ using Microsoft.Data.SqlClient;
 
 namespace CMPT_391_Project_01
 {
+    /// <summary>
+    /// A Windows Form that displays the course history (completed courses) for a specific student.
+    /// </summary>
     public class CourseHistoryForm : Form
     {
-        private readonly int studentId;
+        private readonly int studentId; // The ID of the currently logged-in student
         private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
-        private readonly DataGridView historyGrid = new DataGridView();
+        private readonly DataGridView historyGrid = new DataGridView(); // Grid to display completed courses
 
+        /// <summary>
+        /// Initializes the form and loads the student's course history.
+        /// </summary>
+        /// <param name="studentId">The unique ID of the student</param>
         public CourseHistoryForm(int studentId)
         {
             this.studentId = studentId;
 
+            // Basic form setup
             this.Text = "Course History";
             this.Size = new Size(900, 600);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.White;
 
+            // Configure DataGridView properties
             historyGrid.Dock = DockStyle.Fill;
             historyGrid.ReadOnly = true;
             historyGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -29,12 +38,16 @@ namespace CMPT_391_Project_01
             historyGrid.BackgroundColor = Color.White;
             historyGrid.BorderStyle = BorderStyle.None;
 
-            StyleGrid(historyGrid);
-            LoadCourseHistory();
+            StyleGrid(historyGrid);   // Apply custom styles
+            LoadCourseHistory();      // Load and display course data
 
             this.Controls.Add(historyGrid);
         }
 
+        /// <summary>
+        /// Connects to the database, runs the stored procedure to get completed courses, 
+        /// and binds the result to the DataGridView.
+        /// </summary>
         private void LoadCourseHistory()
         {
             try
@@ -44,12 +57,14 @@ namespace CMPT_391_Project_01
                 {
                     CommandType = CommandType.StoredProcedure
                 };
+
                 cmd.Parameters.AddWithValue("@StudentID", studentId);
 
                 var adapter = new SqlDataAdapter(cmd);
                 var table = new DataTable();
                 adapter.Fill(table);
 
+                // Rename columns for display
                 if (table.Columns.Contains("courseLabel"))
                     table.Columns["courseLabel"]!.ColumnName = "Course Code";
 
@@ -59,24 +74,27 @@ namespace CMPT_391_Project_01
                 if (table.Columns.Contains("Semester"))
                     table.Columns["Semester"]!.ColumnName = "Semester";
 
-           
-
-
+                // Bind the data to the grid
                 historyGrid.DataSource = table;
+
+                // Sort by Academic Year if the column exists
                 var academicYearColumn = historyGrid.Columns["Academic Year"];
                 if (academicYearColumn != null)
                 {
                     historyGrid.Sort(academicYearColumn, ListSortDirection.Descending);
                 }
-
             }
             catch (Exception ex)
             {
+                // Show error if database call fails
                 MessageBox.Show("Failed to load course history.\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-
+        /// <summary>
+        /// Styles the appearance of the DataGridView for a clean, consistent UI.
+        /// </summary>
+        /// <param name="grid">The DataGridView to style</param>
         private void StyleGrid(DataGridView grid)
         {
             grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);

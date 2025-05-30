@@ -6,19 +6,30 @@ using Microsoft.Data.SqlClient;
 
 namespace CMPT_391_Project_01
 {
+    /// <summary>
+    /// Displays a student's registered classes with filters for Fall and Winter semesters.
+    /// Pulls data from the SQL Server using a stored procedure.
+    /// </summary>
     public class ViewRegisteredClassesForm : Form
     {
         private readonly int studentId;
-        private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
+        private readonly string connectionString =
+            "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
+
         private readonly DataGridView registeredClassesGridView;
         private readonly Button fallFilterButton;
         private readonly Button winterFilterButton;
 
+        /// <summary>
+        /// Initializes the form with the given student ID.
+        /// Sets up layout, styling, event handlers, and loads the default class list.
+        /// </summary>
+        /// <param name="studentId">ID of the logged-in student</param>
         public ViewRegisteredClassesForm(int studentId)
         {
             this.studentId = studentId;
 
-            // DataGridView setup
+            // ===== DataGridView Setup =====
             registeredClassesGridView = new DataGridView
             {
                 Dock = DockStyle.Fill,
@@ -31,7 +42,7 @@ namespace CMPT_391_Project_01
             };
             StyleGridView();
 
-            // Filter buttons
+            // ===== Filter Buttons =====
             fallFilterButton = new Button
             {
                 Text = "FALL 2024",
@@ -49,23 +60,31 @@ namespace CMPT_391_Project_01
                 Font = new Font("Segoe UI", 10, FontStyle.Bold)
             };
 
+            // ===== Filter Events =====
             fallFilterButton.Click += (s, e) => LoadRegisteredClasses("Fall", 2024);
             winterFilterButton.Click += (s, e) => LoadRegisteredClasses("Winter", 2025);
 
-
-            // Form setup
+            // ===== Form Setup =====
             this.Text = "My Registered Classes";
             this.Size = new Size(1000, 600);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.White;
 
+            // ===== Add Controls =====
             Controls.Add(registeredClassesGridView);
             Controls.Add(winterFilterButton);
             Controls.Add(fallFilterButton);
 
-            this.Load += (s, e) => LoadRegisteredClasses(); // Load all for current year
+            // Load default data on form load
+            this.Load += (s, e) => LoadRegisteredClasses();
         }
 
+        /// <summary>
+        /// Loads the registered classes for the student.
+        /// Optionally filters by semester and academic year.
+        /// </summary>
+        /// <param name="semester">Semester name (Fall/Winter) or null</param>
+        /// <param name="crseYear">Course year or null</param>
         private void LoadRegisteredClasses(string? semester = null, int? crseYear = null)
         {
             try
@@ -76,6 +95,7 @@ namespace CMPT_391_Project_01
                     CommandType = CommandType.StoredProcedure
                 };
 
+                // Parameters: student ID and optional filters
                 cmd.Parameters.AddWithValue("@StudentID", studentId);
                 cmd.Parameters.AddWithValue("@Semester", (object?)semester ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@CrseYear", (object?)crseYear ?? DBNull.Value);
@@ -84,6 +104,7 @@ namespace CMPT_391_Project_01
                 var table = new DataTable();
                 adapter.Fill(table);
 
+                // Inform if no results
                 if (table.Rows.Count == 0)
                 {
                     MessageBox.Show("No registered classes found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -97,6 +118,9 @@ namespace CMPT_391_Project_01
             }
         }
 
+        /// <summary>
+        /// Applies consistent style to the DataGridView (fonts, colors, selection, etc.)
+        /// </summary>
         private void StyleGridView()
         {
             registeredClassesGridView.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);

@@ -7,8 +7,12 @@ using Microsoft.Data.SqlClient;
 
 namespace CMPT_391_Project_01
 {
+    /// <summary>
+    /// Represents the course search UI form where students can search and view available courses for a given semester.
+    /// </summary>
     public class CourseSearchForm : Form
     {
+        // UI components
         private Panel? sidebar;
         private PictureBox? logo;
 
@@ -18,7 +22,6 @@ namespace CMPT_391_Project_01
         private Label? userRoleLabel;
         private PictureBox? profilePic;
         private Label? backArrow;
-        private readonly Form caller = null!;
 
         private Panel mainContent = null!;
         private Panel? semesterPanel;
@@ -28,22 +31,27 @@ namespace CMPT_391_Project_01
         private Button? searchButton;
         private FlowLayoutPanel resultsPanel = null!;
 
-
-
+        // Session & DB
         private string selectedSemester;
         private readonly string connectionString = "Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;";
-
         private readonly string studentId = null!;
+        private readonly Form caller = null!;
 
-
+        /// <summary>
+        /// Initializes the CourseSearchForm with semester and student ID context.
+        /// </summary>
         public CourseSearchForm(string semester, int studentId)
         {
             this.selectedSemester = semester;
             this.studentId = studentId.ToString();
+
             InitializeComponent();
-            RenderSearchResults("");
+            RenderSearchResults(""); // Load default search results
         }
 
+        /// <summary>
+        /// Gets the full name of the student using a stored procedure.
+        /// </summary>
         private string GetStudentName(string studentId)
         {
             string name = "Student";
@@ -51,15 +59,15 @@ namespace CMPT_391_Project_01
             {
                 using var conn = new SqlConnection(connectionString);
                 conn.Open();
-
-                using var cmd = new SqlCommand("GetStudentFullName", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
+                using var cmd = new SqlCommand("GetStudentFullName", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
                 cmd.Parameters.AddWithValue("@StudentID", studentId);
 
                 var result = cmd.ExecuteScalar();
                 if (result is string fullName)
                     name = fullName;
-
             }
             catch
             {
@@ -67,16 +75,22 @@ namespace CMPT_391_Project_01
             }
             return name;
         }
-        private void viewClassesButton_Click(object? sender, EventArgs e)
 
+        /// <summary>
+        /// Displays the "View Registered Classes" form when button is clicked.
+        /// </summary>
+        private void viewClassesButton_Click(object? sender, EventArgs e)
         {
             ViewRegisteredClassesForm form = new ViewRegisteredClassesForm(Convert.ToInt32(Session.StudentID));
             form.ShowDialog();
         }
 
-
+        /// <summary>
+        /// Initializes all UI components on the form.
+        /// </summary>
         private void InitializeComponent()
         {
+            // General form setup
             this.ClientSize = new Size(1440, 1024);
             this.Text = "Course Search";
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -84,7 +98,7 @@ namespace CMPT_391_Project_01
             this.BackColor = Color.White;
             this.StartPosition = FormStartPosition.CenterScreen;
 
-
+            // Sidebar
             sidebar = new Panel
             {
                 Size = new Size(264, 1024),
@@ -101,10 +115,11 @@ namespace CMPT_391_Project_01
                 Image = Image.FromFile("logo.jpg")
             };
 
+            // Sidebar Buttons
             Button viewClassesButton = new Button
             {
                 Text = "  View My Classes",
-                Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+                Font = new Font("Segoe UI", 12F),
                 ForeColor = Color.FromArgb(11, 35, 94),
                 BackColor = Color.Transparent,
                 FlatStyle = FlatStyle.Flat,
@@ -113,11 +128,16 @@ namespace CMPT_391_Project_01
                 TextAlign = ContentAlignment.MiddleLeft
             };
             viewClassesButton.FlatAppearance.BorderSize = 0;
+            viewClassesButton.Click += (s, e) =>
+            {
+                var viewForm = new ViewRegisteredClassesForm(int.Parse(studentId));
+                viewForm.ShowDialog();
+            };
 
             Button courseHistoryButton = new Button
             {
                 Text = "  Course History",
-                Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+                Font = new Font("Segoe UI", 12F),
                 ForeColor = Color.FromArgb(11, 35, 94),
                 BackColor = Color.Transparent,
                 FlatStyle = FlatStyle.Flat,
@@ -126,26 +146,38 @@ namespace CMPT_391_Project_01
                 TextAlign = ContentAlignment.MiddleLeft
             };
             courseHistoryButton.FlatAppearance.BorderSize = 0;
-
-
-            viewClassesButton.Click += (s, e) =>
+            courseHistoryButton.Click += (s, e) =>
             {
-                var viewForm = new ViewRegisteredClassesForm(int.Parse(studentId)); // assuming studentId is string
-                viewForm.ShowDialog();
+                var historyForm = new CourseHistoryForm(int.Parse(studentId));
+                historyForm.ShowDialog();
             };
 
             sidebar.Controls.Add(viewClassesButton);
-
+            sidebar.Controls.Add(courseHistoryButton);
             sidebar.Controls.Add(logo);
 
-            courseHistoryButton.Click += (s, e) =>
+            Button shoppingCartButton = new Button
             {
-                var historyForm = new CourseHistoryForm(int.Parse(studentId)); // You’ll need to create this form
-                historyForm.ShowDialog();
+                Text = "  My Shopping Cart",
+                Font = new Font("Segoe UI", 12F),
+                ForeColor = Color.FromArgb(11, 35, 94),
+                BackColor = Color.Transparent,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(180, 40),
+                Location = new Point(42, 250),
+                TextAlign = ContentAlignment.MiddleLeft
             };
-            sidebar.Controls.Add(courseHistoryButton);
+            shoppingCartButton.FlatAppearance.BorderSize = 0;
+            shoppingCartButton.Click += (s, e) =>
+            {
+                var cartForm = new ShoppingCartForm(int.Parse(studentId));
+                cartForm.ShowDialog();
 
+            };
 
+            sidebar.Controls.Add(shoppingCartButton);
+
+            // Header Panel
             header = new Panel
             {
                 Size = new Size(1176, 80),
@@ -165,14 +197,8 @@ namespace CMPT_391_Project_01
             backArrow.Click += (s, e) =>
             {
                 this.Hide();
-                if (caller != null)
-                {
-                    caller.Show(); // go back to previous form
-                }
-                else
-                {
-                    new SemesterSelectionForm().Show(); // fallback if no caller provided
-                }
+                if (caller != null) caller.Show();
+                else new SemesterSelectionForm().Show();
             };
 
             titleLabel = new Label
@@ -184,14 +210,6 @@ namespace CMPT_391_Project_01
                 AutoSize = true
             };
 
-            profilePic = new PictureBox
-            {
-                Size = new Size(40, 40),
-                Location = new Point(1076, 20),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Image = Image.FromFile("profile.jpg")
-            };
-
             userNameLabel = new Label
             {
                 Text = $"{GetStudentName(studentId)}",
@@ -199,7 +217,6 @@ namespace CMPT_391_Project_01
                 Location = new Point(920, 20),
                 AutoSize = true
             };
-
 
             userRoleLabel = new Label
             {
@@ -209,12 +226,21 @@ namespace CMPT_391_Project_01
                 AutoSize = true
             };
 
+            profilePic = new PictureBox
+            {
+                Size = new Size(40, 40),
+                Location = new Point(1076, 20),
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Image = Image.FromFile("profile.jpg")
+            };
+
             header.Controls.Add(backArrow);
             header.Controls.Add(titleLabel);
             header.Controls.Add(userNameLabel);
             header.Controls.Add(userRoleLabel);
             header.Controls.Add(profilePic);
 
+            // Main content panel
             mainContent = new Panel
             {
                 Size = new Size(1176, 850),
@@ -223,6 +249,7 @@ namespace CMPT_391_Project_01
                 BorderStyle = BorderStyle.FixedSingle
             };
 
+            // Semester Header Bar
             semesterPanel = new Panel
             {
                 Size = new Size(1112, 56),
@@ -255,36 +282,24 @@ namespace CMPT_391_Project_01
                 semesterLabel.Text = selectedSemester.ToUpper() + " SEMESTER";
                 RenderSearchResults(searchTextBox.Text);
             };
-            changeLink.MouseEnter += (s, e) => changeLink.LinkColor = Color.LightBlue;
-            changeLink.MouseLeave += (s, e) => changeLink.LinkColor = Color.White;
 
             semesterPanel.Controls.Add(semesterLabel);
             semesterPanel.Controls.Add(changeLink);
 
+            // Search Input and Button
             searchTextBox = new TextBox
             {
                 Font = new Font("Segoe UI", 10F),
                 Size = new Size(1041, 46),
                 Location = new Point(30, 100),
                 ForeColor = Color.Gray,
-                Text = "Search...",
-                BorderStyle = BorderStyle.FixedSingle
+                Text = "Search..."
             };
-            searchTextBox.GotFocus += (s, e) =>
-            {
-                if (searchTextBox.Text == "Search...")
-                {
-                    searchTextBox.Text = "";
-                    searchTextBox.ForeColor = Color.Black;
-                }
+            searchTextBox.GotFocus += (s, e) => {
+                if (searchTextBox.Text == "Search...") searchTextBox.Text = "";
             };
-            searchTextBox.LostFocus += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(searchTextBox.Text))
-                {
-                    searchTextBox.Text = "Search...";
-                    searchTextBox.ForeColor = Color.Gray;
-                }
+            searchTextBox.LostFocus += (s, e) => {
+                if (string.IsNullOrWhiteSpace(searchTextBox.Text)) searchTextBox.Text = "Search...";
             };
 
             searchButton = new Button
@@ -298,6 +313,7 @@ namespace CMPT_391_Project_01
             };
             searchButton.Click += (s, e) => RenderSearchResults(searchTextBox.Text);
 
+            // Results panel for displaying search matches
             resultsPanel = new FlowLayoutPanel
             {
                 Location = new Point(30, 160),
@@ -316,96 +332,87 @@ namespace CMPT_391_Project_01
             this.Controls.Add(mainContent);
         }
 
+        /// <summary>
+        /// Executes the course search and displays matching results in card format.
+        /// </summary>
         private void RenderSearchResults(string keyword)
         {
             resultsPanel.Controls.Clear();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            using SqlCommand cmd = new SqlCommand("GetCourseSearchResults", conn)
             {
-                conn.Open();
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.AddWithValue("@Semester", selectedSemester);
+            cmd.Parameters.AddWithValue("@Keyword", "%" + keyword + "%");
 
-                using (SqlCommand cmd = new SqlCommand("GetCourseSearchResults", conn))
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                string rawCourseId = reader["CourseID"].ToString()!;
+                string courseLabel = reader["courseLabel"].ToString()!;
+                string courseName = reader["courseName"].ToString()!;
+                int classCount = Convert.ToInt32(reader["ClassCount"]);
+
+                string displayCourseId = courseLabel + " " + rawCourseId;
+
+                // Build UI Card for each course
+                Panel card = new Panel
                 {
-                    cmd.CommandText = "GetCourseSearchResults";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Semester", selectedSemester);
-                    cmd.Parameters.AddWithValue("@Keyword", "%" + keyword + "%");
+                    Size = new Size(1040, 80),
+                    BackColor = Color.White,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Margin = new Padding(0, 10, 0, 0)
+                };
 
+                card.Controls.Add(new Label
+                {
+                    Text = displayCourseId,
+                    Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(11, 35, 94),
+                    Location = new Point(16, 10),
+                    AutoSize = true
+                });
 
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                card.Controls.Add(new Label
+                {
+                    Text = courseName,
+                    Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(11, 35, 94),
+                    Location = new Point(16, 30),
+                    AutoSize = true
+                });
+
+                card.Controls.Add(new Label
+                {
+                    Text = classCount + " Class options",
+                    Font = new Font("Segoe UI", 9F),
+                    ForeColor = Color.Black,
+                    Location = new Point(16, 55),
+                    AutoSize = true
+                });
+
+                card.Click += (s, e) =>
+                {
+                    var sectionControl = new CourseSectionOptionsControl(rawCourseId, courseLabel, courseName, selectedSemester);
+
+                    sectionControl.BackRequested += (sender, args) =>
                     {
-                        string rawCourseId = reader["CourseID"].ToString()!;
-                        string courseLabel = reader["courseLabel"].ToString()!;
-                        string courseName = reader["courseName"].ToString()!;
-                        int classCount = Convert.ToInt32(reader["ClassCount"]);
+                        mainContent.Controls.Clear();
+                        mainContent.Controls.Add(semesterPanel);
+                        mainContent.Controls.Add(searchTextBox);
+                        mainContent.Controls.Add(searchButton);
+                        mainContent.Controls.Add(resultsPanel);
+                    };
 
-                        string displayCourseId = courseLabel + " " + rawCourseId;
+                    mainContent.Controls.Clear();
+                    mainContent.Controls.Add(sectionControl);
+                };
 
-
-                        Panel card = new Panel
-                        {
-                            Size = new Size(1040, 80),
-                            BackColor = Color.White,
-                            BorderStyle = BorderStyle.FixedSingle,
-                            Margin = new Padding(0, 10, 0, 0)
-                        };
-
-                        Label codeLabel = new Label
-                        {
-                            Text = displayCourseId,
-                            Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                            ForeColor = Color.FromArgb(11, 35, 94),
-                            Location = new Point(16, 10),
-                            AutoSize = true
-                        };
-
-                        Label titleLabel = new Label
-                        {
-                            Text = courseName,
-                            Font = new Font("Segoe UI", 14F, FontStyle.Bold),
-                            ForeColor = Color.FromArgb(11, 35, 94),
-                            Location = new Point(16, 30),
-                            AutoSize = true
-                        };
-
-                        Label classCountLabel = new Label
-                        {
-                            Text = classCount + " Class options",
-                            Font = new Font("Segoe UI", 9F),
-                            ForeColor = Color.Black,
-                            Location = new Point(16, 55),
-                            AutoSize = true
-                        };
-
-                        card.Controls.Add(codeLabel);
-                        card.Controls.Add(titleLabel);
-                        card.Controls.Add(classCountLabel);
-                        resultsPanel.Controls.Add(card);
-
-                        card.Click += (s, e) =>
-                        {
-                            var sectionControl = new CourseSectionOptionsControl(
-                                rawCourseId,
-                                courseLabel,
-                                courseName,
-                                selectedSemester
-                            );
-
-                            sectionControl.BackRequested += (sender, args) =>
-                            {
-                                mainContent.Controls.Clear();
-                                mainContent.Controls.Add(semesterPanel);
-                                mainContent.Controls.Add(searchTextBox);
-                                mainContent.Controls.Add(searchButton);
-                                mainContent.Controls.Add(resultsPanel);
-                            };
-
-                            mainContent.Controls.Clear();
-                            mainContent.Controls.Add(sectionControl);
-                        };
-                    }
-                }
+                resultsPanel.Controls.Add(card);
             }
         }
     }

@@ -205,3 +205,106 @@ BEGIN
         s.Semester DESC;
 END;
 GO
+
+-- Stored Procedure: AddToCart
+CREATE OR ALTER PROCEDURE sp_AddToCart
+    @StudentID BIGINT,
+    @SectionID INT,
+    @CourseID INT,
+    @Semester VARCHAR(20)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @CourseName VARCHAR(50);
+
+    -- Get course name from Course table
+    SELECT @CourseName = courseName FROM Course WHERE CourseID = @CourseID;
+
+    IF @CourseName IS NULL OR @CourseID = 0
+    BEGIN
+        RAISERROR('Invalid CourseID. Course not found.', 16, 1);
+        RETURN;
+    END
+
+    BEGIN TRY
+        INSERT INTO Cart (StudentID, SectionID, CourseID, CourseName, Semester)
+        VALUES (@StudentID, @SectionID, @CourseID, @CourseName, @Semester);
+    END TRY
+    BEGIN CATCH
+        IF ERROR_NUMBER() = 2627
+        BEGIN
+            RAISERROR('This section is already in your cart.', 16, 1);
+        END
+        ELSE
+        BEGIN
+            DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
+            DECLARE @ErrSeverity INT = ERROR_SEVERITY();
+            THROW 50000, @ErrMsg, 1;
+        END
+    END CATCH
+END
+GO
+
+--Stored Procedure to Remove Specific Course 
+CREATE OR ALTER PROCEDURE sp_RemoveFromCart
+    @StudentID BIGINT,
+    @SectionID INT,
+    @CourseID INT
+AS
+BEGIN
+    DELETE FROM Cart
+    WHERE StudentID = @StudentID
+      AND SectionID = @SectionID
+      AND CourseID = @CourseID;
+END
+GO
+
+-- Stored Procedure to Clear Entire Cart
+CREATE OR ALTER PROCEDURE sp_ClearCart
+    @StudentID BIGINT
+AS
+BEGIN
+    DELETE FROM Cart WHERE StudentID = @StudentID;
+END
+GO
+
+-- SP Get Cart Items
+CREATE OR ALTER PROCEDURE sp_GetCartItems
+    @StudentID BIGINT,
+    @Semester VARCHAR(20) = 'All'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF @Semester = 'All'
+    BEGIN
+        SELECT SectionID, StudentID, CourseID, CourseName, Semester
+        FROM Cart
+        WHERE StudentID = @StudentID;
+    END
+    ELSE
+    BEGIN
+        SELECT SectionID, StudentID, CourseID, CourseName, Semester
+        FROM Cart
+        WHERE StudentID = @StudentID AND Semester = @Semester;
+    END
+END
+GO
+
+-- SP to clear all registed courses 
+CREATE OR ALTER PROCEDURE sp_RemoveFromCart
+    @StudentID BIGINT,
+    @SectionID INT,
+    @CourseID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM Cart
+    WHERE StudentID = @StudentID
+      AND SectionID = @SectionID
+      AND CourseID = @CourseID;
+END
+GO
+

@@ -6,8 +6,13 @@ using Microsoft.Data.SqlClient;
 
 namespace CMPT_391_Project_01
 {
+    /// <summary>
+    /// Form for selecting the semester (Fall or Winter) after login.
+    /// Displays a personalized greeting, semester options, and allows logout.
+    /// </summary>
     public class SemesterSelectionForm : Form
     {
+        // UI components
         private Panel leftPanel = null!;
         private Panel rightPanel = null!;
         private PictureBox logo = null!;
@@ -19,16 +24,23 @@ namespace CMPT_391_Project_01
         private PictureBox artImage = null!;
         private Label fallArrow = null!;
         private Label winterArrow = null!;
+
+        // State tracking
         private string selectedSemester = "";
         private string studentId = null!;
 
-
+        /// <summary>
+        /// Constructor that initializes the form and reads the current student ID from session.
+        /// </summary>
         public SemesterSelectionForm()
         {
             studentId = Session.StudentID ?? "";
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Initializes all UI elements, layout, and styles for the form.
+        /// </summary>
         private void InitializeComponent()
         {
             this.ClientSize = new Size(1440, 1024);
@@ -38,7 +50,7 @@ namespace CMPT_391_Project_01
             this.Text = "Select Semester";
             this.BackColor = Color.White;
 
-            // LEFT PANEL
+            // ========== LEFT PANEL ==========
             leftPanel = new Panel
             {
                 Size = new Size(720, 1024),
@@ -81,6 +93,7 @@ namespace CMPT_391_Project_01
                 Location = new Point(160, 310)
             };
 
+            // ========== FALL BUTTON ==========
             fallButton = new Button
             {
                 Text = "FALL\n2024–2025 academic year",
@@ -100,9 +113,8 @@ namespace CMPT_391_Project_01
                 Text = ">",
                 Font = new Font("Segoe UI", 20F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(11, 35, 94),
-                BackColor = Color.Transparent,
-                AutoSize = true,
-                Location = new Point(fallButton.Width - 40, 25)
+                Location = new Point(fallButton.Width - 40, 25),
+                AutoSize = true
             };
             fallArrow.Click += FallButton_Click;
             fallButton.Controls.Add(fallArrow);
@@ -126,6 +138,7 @@ namespace CMPT_391_Project_01
                 }
             };
 
+            // ========== WINTER BUTTON ==========
             winterButton = new Button
             {
                 Text = "WINTER\n2025 academic year",
@@ -145,9 +158,8 @@ namespace CMPT_391_Project_01
                 Text = ">",
                 Font = new Font("Segoe UI", 20F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(11, 35, 94),
-                BackColor = Color.Transparent,
-                AutoSize = true,
-                Location = new Point(winterButton.Width - 40, 25)
+                Location = new Point(winterButton.Width - 40, 25),
+                AutoSize = true
             };
             winterArrow.Click += WinterButton_Click;
             winterButton.Controls.Add(winterArrow);
@@ -171,6 +183,7 @@ namespace CMPT_391_Project_01
                 }
             };
 
+            // ========== LOGOUT BUTTON ==========
             Button logoutButton = new Button
             {
                 Text = "LOGOUT",
@@ -184,17 +197,16 @@ namespace CMPT_391_Project_01
             logoutButton.FlatAppearance.BorderSize = 0;
             logoutButton.Click += LogoutButton_Click;
 
-            leftPanel.Controls.Add(logoutButton);
-
-
+            // Add all elements to left panel
             leftPanel.Controls.Add(logo);
             leftPanel.Controls.Add(secureCourseLabel);
             leftPanel.Controls.Add(welcomeLabel);
             leftPanel.Controls.Add(instructionLabel);
             leftPanel.Controls.Add(fallButton);
             leftPanel.Controls.Add(winterButton);
+            leftPanel.Controls.Add(logoutButton);
 
-            // RIGHT PANEL
+            // ========== RIGHT PANEL ==========
             rightPanel = new Panel
             {
                 Size = new Size(720, 1024),
@@ -211,19 +223,21 @@ namespace CMPT_391_Project_01
             };
             rightPanel.Controls.Add(artImage);
 
+            // Add both panels to the form
             this.Controls.Add(leftPanel);
             this.Controls.Add(rightPanel);
         }
 
+        /// <summary>
+        /// Retrieves the full name of the student for personalized greeting.
+        /// </summary>
         private string GetStudentName(string studentId)
         {
             string name = "Student";
-
             try
             {
                 using var conn = new SqlConnection("Server=DESKTOP-JKB2ILV\\MSSQLSERVER01;Database=CMPT_391_P01;Trusted_Connection=True;TrustServerCertificate=True;");
                 conn.Open();
-
                 using var cmd = new SqlCommand("GetStudentFullName", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@StudentID", studentId);
@@ -231,17 +245,20 @@ namespace CMPT_391_Project_01
                 var result = cmd.ExecuteScalar();
                 if (result is not null && result != DBNull.Value)
                 {
-                    name = result?.ToString() ?? "Student";
+                    name = result.ToString()!;
                 }
             }
             catch
             {
-                name = "Student";
+                name = "Student"; // fallback
             }
 
-            return name ?? "Student";
+            return name;
         }
 
+        /// <summary>
+        /// Event handler for Fall button. Loads Fall semester courses.
+        /// </summary>
         private void FallButton_Click(object? sender, EventArgs e)
         {
             selectedSemester = "fall";
@@ -256,9 +273,11 @@ namespace CMPT_391_Project_01
             this.Hide();
             var courseSearch = new CourseSearchForm("fall", int.Parse(studentId));
             courseSearch.Show();
-
         }
 
+        /// <summary>
+        /// Event handler for Winter button. Loads Winter semester courses.
+        /// </summary>
         private void WinterButton_Click(object? sender, EventArgs e)
         {
             selectedSemester = "winter";
@@ -273,8 +292,11 @@ namespace CMPT_391_Project_01
             this.Hide();
             var courseSearch = new CourseSearchForm("winter", int.Parse(studentId));
             courseSearch.Show();
-
         }
+
+        /// <summary>
+        /// Logs out the user and returns to the login screen.
+        /// </summary>
         private void LogoutButton_Click(object? sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -292,7 +314,5 @@ namespace CMPT_391_Project_01
                 this.Close();
             }
         }
-
-
     }
 }
