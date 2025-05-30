@@ -311,4 +311,3 @@ BEGIN
       AND CourseID = @CourseID;
 END
 GO
-

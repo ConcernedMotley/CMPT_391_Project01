@@ -107,13 +107,13 @@ namespace CMPT_391_Project_01
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            logo = new PictureBox
-            {
-                Size = new Size(64, 64),
-                Location = new Point(100, 50),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Image = Image.FromFile("logo.jpg")
-            };
+            //logo = new PictureBox
+            //{
+            //    Size = new Size(64, 64),
+            //    Location = new Point(100, 50),
+            //    SizeMode = PictureBoxSizeMode.StretchImage,
+            //    Image = Image.FromFile("logo.jpg")
+            //};
 
             // Sidebar Buttons
             Button viewClassesButton = new Button

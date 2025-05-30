@@ -172,7 +172,6 @@ VALUES
 (21, 101, 2024, 'Fall', 'Intro to Programming', 2, 50,3),
 (22, 101, 2024, 'Fall', 'Intro to Programming', 3, 50,3);
 
-
 -- Sect timeslots
 INSERT INTO Sect_TimeSlot (TimeSlotID, SectionID, StartTime, EndTime, DayOfWeek)
 VALUES
