@@ -180,33 +180,28 @@ GO
 -- PROCEDURE: Get Completed Courses for a Student
 -- Groups results by academic year
 -- =========================================
-CREATE OR ALTER PROCEDURE GetCompletedCoursesForStudent
+CREATE OR ALTER PROCEDURE GetCompletedCoursesForStudent 
     @StudentID INT
 AS
 BEGIN
     SELECT 
-        c.CourseID,
-        c.courseLabel,
-        c.CourseName,
-        s.Semester,
-        s.CrseYear,
-        CASE 
-            WHEN s.Semester = 'Fall' THEN s.CrseYear
-            WHEN s.Semester = 'Winter' THEN s.CrseYear - 1
-            ELSE s.CrseYear
-        END AS AcademicYear
-    FROM Takes t
-    INNER JOIN Section s ON t.SectionID = s.SectionID
-    INNER JOIN Course c ON s.CourseID = c.CourseID
-    WHERE t.StudentID = @StudentID
-      AND t.Grade IS NOT NULL -- Only completed classes
-    ORDER BY 
-        AcademicYear DESC,
-        s.Semester DESC;
+        C.courseLabel + ' ' + CAST(C.CourseID AS VARCHAR) AS [Course], -- Combined
+        C.courseName AS [Course Name],
+        S.Semester,
+        T.Grade AS [Letter Grade]
+    FROM Takes T
+    INNER JOIN Section S ON T.SectionID = S.SectionID
+    INNER JOIN Course C ON T.CourseID = C.CourseID
+    WHERE T.StudentID = @StudentID
 END;
 GO
 
--- Stored Procedure: AddToCart
+
+
+-- =========================================
+-- PROCEDURE: Add Course to Cart
+-- Inserts new course section to student's cart
+-- =========================================
 CREATE OR ALTER PROCEDURE sp_AddToCart
     @StudentID BIGINT,
     @SectionID INT,
@@ -246,7 +241,10 @@ BEGIN
 END
 GO
 
---Stored Procedure to Remove Specific Course 
+-- =========================================
+-- PROCEDURE: Remove Specific Course from Cart
+-- Deletes a single course from the cart
+-- =========================================
 CREATE OR ALTER PROCEDURE sp_RemoveFromCart
     @StudentID BIGINT,
     @SectionID INT,
@@ -260,7 +258,10 @@ BEGIN
 END
 GO
 
--- Stored Procedure to Clear Entire Cart
+-- =========================================
+-- PROCEDURE: Clear Entire Cart
+-- Removes all courses from the cart for a student
+-- =========================================
 CREATE OR ALTER PROCEDURE sp_ClearCart
     @StudentID BIGINT
 AS
@@ -269,7 +270,10 @@ BEGIN
 END
 GO
 
--- SP Get Cart Items
+-- =========================================
+-- PROCEDURE: Get Cart Items
+-- Returns cart contents for a student, optionally filtered by semester
+-- =========================================
 CREATE OR ALTER PROCEDURE sp_GetCartItems
     @StudentID BIGINT,
     @Semester VARCHAR(20) = 'All'

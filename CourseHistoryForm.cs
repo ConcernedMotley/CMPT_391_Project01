@@ -65,8 +65,8 @@ namespace CMPT_391_Project_01
                 adapter.Fill(table);
 
                 // Rename columns for display
-                if (table.Columns.Contains("courseLabel"))
-                    table.Columns["courseLabel"]!.ColumnName = "Course Code";
+                if (table.Columns.Contains("Course"))
+                    table.Columns["Course"]!.ColumnName = "Course";
 
                 if (table.Columns.Contains("CourseName"))
                     table.Columns["CourseName"]!.ColumnName = "Course Name";
@@ -74,19 +74,17 @@ namespace CMPT_391_Project_01
                 if (table.Columns.Contains("Semester"))
                     table.Columns["Semester"]!.ColumnName = "Semester";
 
+                if (table.Columns.Contains("Grade"))
+                    table.Columns["Grade"]!.ColumnName = "Letter Grade";
+
+
                 // Bind the data to the grid
+                historyGrid.DataSource = null;
                 historyGrid.DataSource = table;
 
-                // Sort by Academic Year if the column exists
-                var academicYearColumn = historyGrid.Columns["Academic Year"];
-                if (academicYearColumn != null)
-                {
-                    historyGrid.Sort(academicYearColumn, ListSortDirection.Descending);
-                }
             }
             catch (Exception ex)
             {
-                // Show error if database call fails
                 MessageBox.Show("Failed to load course history.\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

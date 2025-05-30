@@ -8,6 +8,10 @@ using Microsoft.Data.SqlClient;
 
 namespace CMPT_391_Project_01
 {
+    /// <summary>
+    /// Represents the shopping cart interface where students can view, filter, select,
+    /// remove, or register courses added to their cart.
+    /// </summary>
     public class ShoppingCartForm : Form
     {
         private readonly int studentId;
@@ -19,15 +23,21 @@ namespace CMPT_391_Project_01
         private readonly HashSet<(int SectionID, int CourseID)> selectedBeforeReload = new();
         private readonly CheckBox selectAllCheckBox;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShoppingCartForm"/> class.
+        /// </summary>
+        /// <param name="studentId">The ID of the logged-in student.</param>
         public ShoppingCartForm(int studentId)
         {
             this.studentId = studentId;
 
+            // Form setup
             this.Text = "My Shopping Cart";
             this.Size = new Size(1000, 650);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.White;
 
+            // Initialize UI controls
             semesterFilter = new ComboBox
             {
                 Location = new Point(50, 20),
@@ -93,6 +103,7 @@ namespace CMPT_391_Project_01
             };
             checkoutButton.Click += CheckoutButton_Click;
 
+            // Add components to form
             this.Controls.Add(semesterFilter);
             this.Controls.Add(cartGridView);
             this.Controls.Add(removeButton);
@@ -107,6 +118,9 @@ namespace CMPT_391_Project_01
             LoadCartItems();
         }
 
+        /// <summary>
+        /// Styles the DataGridView headers and rows.
+        /// </summary>
         private void StyleGridView()
         {
             cartGridView.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
@@ -120,8 +134,12 @@ namespace CMPT_391_Project_01
             cartGridView.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
         }
 
+        /// <summary>
+        /// Loads cart items from the database via stored procedure and populates the grid.
+        /// </summary>
         private void LoadCartItems()
         {
+            // Save selection state before refresh
             selectedBeforeReload.Clear();
             foreach (DataGridViewRow row in cartGridView.Rows)
             {
@@ -166,12 +184,16 @@ namespace CMPT_391_Project_01
             }
         }
 
+        /// <summary>
+        /// Adds the "Select All" checkbox to the DataGridView header.
+        /// </summary>
         private void AddSelectAllCheckboxToHeader()
         {
             Rectangle headerCell = cartGridView.GetCellDisplayRectangle(cartGridView.Columns["Select"].Index, -1, true);
             selectAllCheckBox.Location = new Point(
                 headerCell.Left + (headerCell.Width - selectAllCheckBox.Width) / 2,
                 headerCell.Top + (headerCell.Height - selectAllCheckBox.Height) / 2);
+
             selectAllCheckBox.CheckedChanged -= SelectAllCheckBox_CheckedChanged;
             selectAllCheckBox.CheckedChanged += SelectAllCheckBox_CheckedChanged;
 
@@ -181,6 +203,9 @@ namespace CMPT_391_Project_01
             }
         }
 
+        /// <summary>
+        /// Handles logic for selecting or deselecting all rows when the header checkbox is toggled.
+        /// </summary>
         private void SelectAllCheckBox_CheckedChanged(object? sender, EventArgs e)
         {
             foreach (DataGridViewRow row in cartGridView.Rows)
@@ -189,12 +214,9 @@ namespace CMPT_391_Project_01
             }
         }
 
-        private void CartGridView_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == cartGridView.Columns["Select"].Index)
-                UpdateRemoveButtonState();
-        }
-
+        /// <summary>
+        /// Enables or disables the Remove button depending on checkbox selections.
+        /// </summary>
         private void UpdateRemoveButtonState()
         {
             bool anySelected = cartGridView.Rows.Cast<DataGridViewRow>()
@@ -202,6 +224,18 @@ namespace CMPT_391_Project_01
             removeButton.Enabled = anySelected;
         }
 
+        /// <summary>
+        /// Handles checkbox value changes to update button state.
+        /// </summary>
+        private void CartGridView_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == cartGridView.Columns["Select"].Index)
+                UpdateRemoveButtonState();
+        }
+
+        /// <summary>
+        /// Removes selected rows or all rows if nothing is selected, using stored procedures.
+        /// </summary>
         private void RemoveButton_Click(object? sender, EventArgs e)
         {
             var selectedItems = cartGridView.Rows.Cast<DataGridViewRow>()
@@ -252,6 +286,9 @@ namespace CMPT_391_Project_01
             }
         }
 
+        /// <summary>
+        /// Registers the selected courses using a stored procedure and removes them from the cart.
+        /// </summary>
         private void CheckoutButton_Click(object? sender, EventArgs e)
         {
             var selectedItems = cartGridView.Rows.Cast<DataGridViewRow>()
