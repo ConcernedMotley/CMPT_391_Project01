@@ -1,6 +1,5 @@
 USE CMPT_391_P01;
 
-
 --Delete old records
 DELETE FROM Cart;
 DELETE FROM Sect_TimeSlot;
@@ -10,6 +9,16 @@ DELETE FROM Section;
 DELETE FROM Course;
 DELETE FROM Student;
 DELETE FROM Classroom;
+DELETE FROM Instructor;
+
+
+-- INSERT INTO Instructor
+INSERT INTO Instructor (InstructorID, FirstName, LastName, Department)
+VALUES 
+(1, 'John', 'Doe', 'Computer Science'),
+(2, 'Emily', 'Watson', 'Computer Science'),
+(3, 'Raj', 'Patel', 'Computer Science');
+
 
 -- INSERT INTO Student
 INSERT INTO Student (StudentID, first_name, last_name, department)
@@ -114,58 +123,61 @@ VALUES
 (20, 'Evans Annex', '120E', 40);
 
 --Insert Courses
-INSERT INTO Course (CourseID, courseName, credits, prereq, Faculty)
+INSERT INTO Course (CourseID, courseLabel, courseName, credits, prereq)
 VALUES
-(101, 'Intro to Programming', 3, NULL, 'CMPT'),
-(200, 'Data Structures', 3, 101, 'CMPT'),
-(204, 'Algorithms', 3, 200, 'CMPT'),
-(229, 'Computer Architecture', 3, 200, 'CMPT'),
-(360, 'Operating Systems', 3, 200, 'CMPT'),
-(291, 'Databases', 3, 101, 'CMPT'),
-(395, 'Software Engineering', 3, 200, 'CMPT'),
-(315, 'Web Development', 3, 200, 'CMPT'),
-(305, 'Mobile App Development', 3, 395, 'CMPT'),
-(255, 'Machine Learning', 3, 204, 'CMPT'),
-(355, 'Artificial Intelligence', 3, 255, 'CMPT'),
-(361, 'Networks', 3, 360, 'CMPT'),
-(280, 'Cybersecurity Fundamentals', 3, 229, 'CMPT'),
-(250, 'Human-Computer Interaction', 3, 101, 'CMPT'),
-(272, 'Discrete Math', 3, NULL, 'CMPT'),
-(104, 'Theory of Computation', 3, NULL, 'CMPT'),
-(391, 'Advanced Databases', 3, 291, 'CMPT'),
-(299, 'Cloud Computing', 3, 200, 'CMPT'),
-(497, 'DevOps Practices', 3, 395, 'CMPT'),
-(496, 'Capstone Project', 3, 395, 'CMPT');
+(101, 'CMPT', 'Intro to Programming', 3, NULL),
+(200, 'CMPT', 'Data Structures', 3, 101),
+(204, 'CMPT', 'Algorithms', 3, 200),
+(229, 'CMPT', 'Computer Architecture', 3, 200),
+(360, 'CMPT', 'Operating Systems', 3, 200),
+(291, 'CMPT', 'Databases', 3, 101),
+(395, 'CMPT', 'Software Engineering', 3, 200),
+(315, 'CMPT', 'Web Development', 3, 200),
+(305, 'CMPT', 'Mobile App Development', 3, 395),
+(255, 'CMPT', 'Machine Learning', 3, 204),
+(355, 'CMPT', 'Artificial Intelligence', 3, 255),
+(361, 'CMPT', 'Networks', 3, 360),
+(280, 'CMPT', 'Cybersecurity Fundamentals', 3, 229),
+(250, 'CMPT', 'Human-Computer Interaction', 3, 101),
+(272, 'CMPT', 'Discrete Math', 3, NULL),
+(104, 'CMPT', 'Theory of Computation', 3, NULL),
+(391, 'CMPT', 'Advanced Databases', 3, 291),
+(299, 'CMPT', 'Cloud Computing', 3, 200),
+(497, 'CMPT', 'DevOps Practices', 3, 395),
+(496, 'CMPT', 'Capstone Project', 3, 395);
 
 -- Insert Section
-INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID, Capicity, Faculty)
+INSERT INTO Section (SectionID, CourseID, CrseYear, Semester, CrseName, ClassroomID,Capacity,InstructorID)
 VALUES
-(1, 101, 2024, 'Fall', 'Intro to Programming', 1, 50, 'CMPT'),
-(2, 200, 2024, 'Fall', 'Data Structures', 2, 40, 'CMPT'),
-(3, 204, 2024, 'Winter', 'Algorithms', 3, 35, 'CMPT'),
-(4, 229, 2024, 'Winter', 'Computer Architecture', 4, 50, 'CMPT'),
-(5, 360, 2025, 'Fall', 'Operating Systems', 5, 45, 'CMPT'),
-(6, 291, 2024, 'Fall', 'Databases', 6, 60, 'CMPT'),
-(7, 395, 2025, 'Winter', 'Software Engineering', 7, 50, 'CMPT'),
-(8, 315, 2024, 'Spring', 'Web Development', 8, 30, 'CMPT'),
-(9, 305, 2025, 'Spring', 'Mobile App Development', 9, 25, 'CMPT'),
-(10, 255, 2025, 'Fall', 'Machine Learning', 10, 40, 'CMPT'),
-(11, 355, 2025, 'Winter', 'Artificial Intelligence', 11, 35, 'CMPT'),
-(12, 361, 2025, 'Fall', 'Networks', 12, 45, 'CMPT'),
-(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals', 13, 40, 'CMPT'),
-(14, 250, 2024, 'Fall', 'Human-Computer Interaction', 14, 35, 'CMPT'),
-(15, 272, 2024, 'Fall', 'Discrete Math', 15, 50, 'CMPT'),
-(16, 104, 2024, 'Spring', 'Theory of Computation', 16, 30, 'CMPT'),
-(17, 391, 2025, 'Spring', 'Advanced Databases', 17, 25, 'CMPT'),
-(18, 299, 2025, 'Winter', 'Cloud Computing', 18, 50, 'CMPT'),
-(19, 497, 2025, 'Spring', 'DevOps Practices', 19, 35, 'CMPT'),
-(20, 496, 2025, 'Spring', 'Capstone Project', 20, 40, 'CMPT');
-
+(1, 101, 2024, 'Fall', 'Intro to Programming', 1, 50,3),
+(2, 200, 2024, 'Fall', 'Data Structures', 2, 40,1),
+(3, 204, 2024, 'Winter', 'Algorithms', 3, 35,2),
+(4, 229, 2024, 'Winter', 'Computer Architecture', 4, 50,3),
+(5, 360, 2025, 'Fall', 'Operating Systems', 5, 45,2),
+(6, 291, 2024, 'Fall', 'Databases', 6, 60,1),
+(7, 395, 2025, 'Winter', 'Software Engineering', 7, 50,3),
+(8, 315, 2024, 'Spring', 'Web Development', 8, 30,2),
+(9, 305, 2025, 'Spring', 'Mobile App Development', 9, 25,1),
+(10, 255, 2025, 'Fall', 'Machine Learning', 10, 40,2),
+(11, 355, 2025, 'Winter', 'Artificial Intelligence', 11, 35,3),
+(12, 361, 2025, 'Fall', 'Networks', 12, 45,2),
+(13, 280, 2024, 'Winter', 'Cybersecurity Fundamentals', 13, 40,1),
+(14, 250, 2024, 'Fall', 'Human-Computer Interaction', 14, 35,1),
+(15, 272, 2024, 'Fall', 'Discrete Math', 15, 50,2),
+(16, 104, 2024, 'Spring', 'Theory of Computation', 16, 30,3),
+(17, 391, 2025, 'Spring', 'Advanced Databases', 17, 25,2),
+(18, 299, 2025, 'Winter', 'Cloud Computing', 18, 50,3),
+(19, 497, 2025, 'Spring', 'DevOps Practices', 19, 35,2),
+(20, 496, 2025, 'Spring', 'Capstone Project', 20, 40,1),
+(21, 101, 2024, 'Fall', 'Intro to Programming', 2, 50,3),
+(22, 101, 2024, 'Fall', 'Intro to Programming', 3, 50,3);
 
 -- Sect timeslots
 INSERT INTO Sect_TimeSlot (TimeSlotID, SectionID, StartTime, EndTime, DayOfWeek)
 VALUES
 (1, 1, '09:00', '10:20', 'Monday'),
+(21, 21, '10:20', '11:50', 'Tuesday'),
+(22, 22, '10:20', '11:50', 'Monday'),
 (2, 2, '10:30', '11:50', 'Tuesday'),
 (3, 3, '13:00', '14:20', 'Wednesday'),
 (4, 4, '14:30', '15:50', 'Thursday'),
@@ -205,7 +217,6 @@ VALUES
 (5, 1000002, 360, 'Operating Systems'),
 
 -- Student 1000003 takes Web Dev, Software Eng (prereq satisfied)
-(1, 1000003, 101, 'Intro to Programming'),
 (2, 1000003, 200, 'Data Structures'),
 (7, 1000003, 395, 'Software Engineering'),
 (8, 1000003, 315, 'Web Development'),
@@ -252,3 +263,21 @@ VALUES
 (2, 1000012, 200, 'Data Structures'),
 (7, 1000012, 395, 'Software Engineering'),
 (19, 1000012, 497, 'DevOps Practices');
+
+-- =========================================
+-- INSERT INTO Takes (Completed Courses with Grades)
+-- =========================================
+INSERT INTO Takes (CourseID, SectionID, StudentID, Grade)
+VALUES
+(299, 18, 1000000, 'B-'),
+(250, 14, 1000000, 'C'),
+(280, 13, 1000000, 'C+'),
+(280, 13, 1000001, 'C'),
+(204, 3, 1000001, 'B'),
+(391, 17, 1000002, 'B-'),
+(496, 20, 1000002, 'A'),
+(360, 5, 1000002, 'B'),
+(104, 16, 1000002, 'C'),
+(496, 20, 1000003, 'A'),
+(204, 3, 1000003, 'A-'),
+(280, 13, 1000003, 'A-');

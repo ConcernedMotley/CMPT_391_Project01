@@ -1,15 +1,18 @@
--- Make sure you're using a different database (e.g., master)
+-- ================================================
+-- DATABASE RESET & SCHEMA SETUP FOR CMPT_391_P01
+-- ================================================
+
+-- Step 1: Make sure you're using a different DB context
 USE master;
 GO
-
--- If the database exists, force drop it
+-- Step 2: Drop the CMPT_391_P01 database if it exists
 IF EXISTS (
     SELECT name 
     FROM sys.databases 
     WHERE name = N'CMPT_391_P01'
 )
 BEGIN
-    -- Force disconnect all users and rollback open transactions
+    -- Force disconnect all users and rollback transactions
     ALTER DATABASE CMPT_391_P01 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
     
     -- Now safely drop it
@@ -17,14 +20,18 @@ BEGIN
 END
 GO
 
--- Recreate the database
+-- Step 3: Recreate the database
 CREATE DATABASE CMPT_391_P01;
 GO
 
--- Switch to the new database
+-- Step 4: Switch to the new database
 USE CMPT_391_P01;
 GO
 
+-- =============================================
+-- TABLE CLEANUP: Drop Tables If They Exist
+-- (in correct dependency order)
+-- =============================================
 DROP TABLE IF EXISTS StudentCredentials;
 DROP TABLE IF EXISTS Cart;
 DROP TABLE IF EXISTS Takes;
@@ -33,26 +40,43 @@ DROP TABLE IF EXISTS Classroom;
 DROP TABLE IF EXISTS Student;
 DROP TABLE IF EXISTS Section;
 DROP TABLE IF EXISTS Course;
+DROP TABLE IF EXISTS Instructor;
 
+-- =============================================
+-- TABLE DEFINITIONS
+-- =============================================
 
+-- TABLE: Instructor
+-- Stores instructor information
+CREATE TABLE Instructor (
+    InstructorID INT PRIMARY KEY,
+    FirstName NVARCHAR(20),
+    LastName NVARCHAR(20),
+    Department NVARCHAR(50)
+);
+-- TABLE: Student
+-- Stores student personal and academic details
 --Student (student_id, first_name, last_name, department) - Ethan
 CREATE TABLE Student (
     StudentID bigint PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    department VARCHAR(100)
+    first_name VARCHAR(20),
+    last_name VARCHAR(20),
+    department VARCHAR(50)
 );
 
---Course (course_id, courseName, credits, prereq) - Ethan
-
+-- TABLE: Course
+-- Stores course catalog with prerequisites
+--Course (course_id,courseLabel, courseName, credits, prereq) - Ethan
 CREATE TABLE Course (
     CourseID INT PRIMARY KEY,
-    courseName VARCHAR(100),
-	Faculty VARCHAR(20),
+    courseLabel VARCHAR(4),      -- e.g., 'CMPT', 'ENGL'
+    courseName VARCHAR(50),
     credits INT,
-    prereq INT,
+    prereq INT
 );
 
+-- TABLE: Classroom
+-- Stores information about physical classrooms
 --Classroom (classroom_id, building, roomNumber, capacity) - Nat
 CREATE TABLE Classroom (
     ClassroomID INT NOT NULL PRIMARY KEY,
@@ -61,6 +85,8 @@ CREATE TABLE Classroom (
     Capacity INT NOT NULL,
 );
 
+-- TABLE: Section
+-- Represents course offerings per semester
 --Section (section_id, year, semester, course_id, courseName, ClassroomID, Capicity) - Sankalp
 CREATE TABLE Section(
 	SectionID int NOT NULL PRIMARY KEY,
@@ -68,13 +94,16 @@ CREATE TABLE Section(
 	CourseID int NOT NULL,
 	CrseYear int NOT NULL,
 	Semester varchar(10) NOT NULL,
-	CrseName varchar(40) NOT NULL,
-	Capicity INT NOT NULL,
-	Faculty VARCHAR(20),
+	CrseName varchar(50) NOT NULL,
+	Capacity INT NOT NULL,
+    InstructorID INT,
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
-	FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID)
+	FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID),
+    FOREIGN KEY (InstructorID) REFERENCES Instructor(InstructorID)
 );
 
+-- TABLE: StudentCredentials
+-- Stores student login details
 -- StudentCredentials (student_id, username, studentPassword) - Sankalp
 CREATE TABLE StudentCredentials (
 	StudentID bigint NOT NULL,
@@ -83,19 +112,22 @@ CREATE TABLE StudentCredentials (
 	FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
 );
 
+-- TABLE: Takes
+-- Tracks student registrations and grades
 --Takes (course_id, section_id, grade, student_id) - Sankalp
 CREATE TABLE Takes (
 	CourseID int NOT NULL,
 	SectionID int NOT NULL,
-	Grade float,
+	Grade VARCHAR (2) null,
 	StudentID bigint NOT NULL,
-	CONSTRAINT PK_Takes PRIMARY KEY (CourseID, SectionID, Grade, StudentID),
+	CONSTRAINT PK_Takes PRIMARY KEY (CourseID, SectionID, StudentID),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
 	FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
 	FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
 );
 
-
+-- TABLE: Sect_TimeSlot
+-- Stores timing information for each section
 --sect_timeSlot (timeslot_id,  section_id, st art_time, end_time, day(s)) - Nat
 CREATE TABLE Sect_TimeSlot (
     TimeSlotID INT PRIMARY KEY,
@@ -106,13 +138,16 @@ CREATE TABLE Sect_TimeSlot (
     FOREIGN KEY (SectionID) REFERENCES Section(SectionID)
 );
 
+-- TABLE: Cart
+-- Temporary table to store courses being registered (e.g., for preview before finalizing)
 --Cart (SectionID, StudentID, CourseID, CourseName) - Sankalp
 CREATE TABLE Cart (
 	
 	SectionID INT,
 	StudentID BIGINT,
 	CourseID INT,
-	CourseName VARCHAR(100),
+	CourseName VARCHAR(50),
+    Semester VARCHAR(20),
 	CONSTRAINT PK_Cart PRIMARY KEY (SectionID, StudentID, CourseID, CourseName),
 	FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
 	FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
